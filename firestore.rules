@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(roles) {
+      return isSignedIn() && getUserData().role in roles;
+    }
+
+    // Publicly readable courses catalog; writable by creators, reviewers, registrars, superusers
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Atomic Learning Units (ALU) index for Cross-Course Dynamic Pathways
+    match /subtopics_index/{aluId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Regional Simulation Labs & Bookings
+    match /labs/{labId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /bookings/{bookingId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // User Profiles & Progress
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isSignedIn();
+      match /progress/{courseId} {
+        allow read, write: if isSignedIn();
+      }
+    }
+
+    // Practitioner Q&A Desk
+    match /questions/{questionId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Verifiable SHA-256 CPD Certificates
+    match /certificates/{certId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // OSCE Escrow Queue & LDHF Facility Drills
+    match /osce_escrow/{recordId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /ldhf_drills/{drillId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // FinTech Transactions & Smart Vouchers
+    match /transactions/{txId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /vouchers/{voucherId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}
+

@@ -1,0 +1,2528 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+app/
+  courses/
+    [id]/
+      page.js
+  labs/
+    page.js
+  practitioners/
+    page.js
+  profile/
+    page.js
+  studio/
+    page.js
+  favicon.ico
+  globals.css
+  layout.js
+  page.js
+components/
+  AIAssistant.js
+  AuthProvider.js
+  Footer.js
+  Navbar.js
+lib/
+  firebase.js
+public/
+  file.svg
+  globe.svg
+  manifest.json
+  next.svg
+  sw.js
+  vercel.svg
+  window.svg
+  workbox-4754cb34.js
+.gitignore
+AGENTS.md
+CLAUDE.md
+eslint.config.mjs
+jsconfig.json
+next.config.mjs
+package.json
+postcss.config.mjs
+README.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="app/courses/[id]/page.js">
+"use client";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../../components/AuthProvider';
+import { Lock, PlayCircle, CheckCircle, Clock, Award, FileText, ArrowLeft, Info } from 'lucide-react';
+import Link from 'next/link';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+
+
+export default function CoursePage({ params }) {
+  const { user, loginWithGoogle } = useAuth();
+  const [course, setCourse] = useState(null);
+  const [selectedModIdx, setSelectedModIdx] = useState(0);
+  const [selectedTopIdx, setSelectedTopIdx] = useState(0);
+  const unwrappedParams = React.use(params);
+  const id = unwrappedParams.id;
+
+  useEffect(() => {
+    async function fetchCourse() {
+      try {
+        const docRef = doc(db, 'courses', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setCourse({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          setCourse(null);
+        }
+      } catch(err) {
+        console.error("Error fetching course:", err);
+      }
+    }
+    fetchCourse();
+  }, [id]);
+
+  if (!course) return <div style={{ padding: '100px', textAlign: 'center' }}><div className="spinner"></div></div>;
+
+  return (
+    <div className="animate-fade-in" style={{ paddingBottom: '80px' }}>
+      <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', textDecoration: 'none', marginBottom: '24px', fontWeight: 500, width: 'fit-content' }}>
+        <ArrowLeft size={20} /> Back to Courses
+      </Link>
+
+      <div className="grid-2" style={{ gap: '40px', alignItems: 'start', gridTemplateColumns: '1fr 350px' }}>
+        
+        {/* Main Content Area */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
+          
+          <div>
+            <div className="badge badge-warning" style={{ marginBottom: '12px' }}>{course.category}</div>
+            <h1 style={{ fontSize: '2rem', marginBottom: '16px', lineHeight: 1.2 }}>{course.title}</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1.6 }}>
+              {course.description}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '24px', padding: '16px 24px', background: '#fff', borderRadius: 'var(--radius-md)', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Clock size={20} color="var(--primary)" />
+              <div>
+                <p style={{ fontSize: '0.85rem', color: '#64748b' }}>Duration</p>
+                <p style={{ fontWeight: 600, color: '#0f172a' }}>{course.duration}</p>
+              </div>
+            </div>
+            <div style={{ width: '1px', background: '#f1f5f9' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Award size={20} color="var(--accent)" />
+              <div>
+                <p style={{ fontSize: '0.85rem', color: '#64748b' }}>CPD Points</p>
+                <p style={{ fontWeight: 600, color: '#0f172a' }}>{course.cpd}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Dynamic Content */}
+          {!user ? (
+            <div style={{ width: '100%', aspectRatio: '16/9', background: '#000', borderRadius: 'var(--radius-lg)', overflow: 'hidden', position: 'relative' }}>
+              <img src={course.image} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(3, 4, 94, 0.8)', backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', textAlign: 'center' }}>
+                <Lock size={48} color="var(--primary)" style={{ marginBottom: '16px' }} />
+                <h3 style={{ color: '#fff', fontSize: '1.5rem', marginBottom: '12px' }}>Unlock Full Access</h3>
+                <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '24px', maxWidth: '400px' }}>
+                  Register or sign in to continue watching this module, access resources, and earn your CPD points.
+                </p>
+                <button onClick={loginWithGoogle} className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem' }}>
+                  Sign In to Continue
+                </button>
+              </div>
+            </div>
+          ) : course.modules && course.modules.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', marginTop: '16px' }}>
+              {(() => {
+                const currentTopic = course.modules[selectedModIdx]?.topics?.[selectedTopIdx];
+                if (!currentTopic) return <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: 'var(--radius-lg)', border: '1px solid #f1f5f9' }}>No content available for this topic.</div>;
+                
+                return (
+                  <>
+                    <h2 style={{ fontSize: '1.75rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', color: '#0f172a' }}>{currentTopic.title}</h2>
+                    
+                    {/* Video Players */}
+                    {currentTopic.resources?.filter(r => r.type === 'video').map((res, i) => (
+                       <div key={i} style={{ width: '100%', aspectRatio: '16/9', background: '#000', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+                          <video src={res.url} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                       </div>
+                    ))}
+
+                    {/* Rich Text Content */}
+                    {currentTopic.content && (
+                      <div style={{ padding: '32px', whiteSpace: 'pre-wrap', lineHeight: 1.8, fontSize: '1.05rem', color: '#334155', background: '#fff', borderRadius: 'var(--radius-lg)', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                        {currentTopic.content}
+                      </div>
+                    )}
+
+                    {/* Other Resources */}
+                    {currentTopic.resources?.filter(r => r.type !== 'video').length > 0 && (
+                      <div style={{ background: '#f8fafc', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0' }}>
+                        <h4 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}><FileText size={18} color="var(--primary)" /> Topic Resources</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {currentTopic.resources.filter(r => r.type !== 'video').map((res, i) => (
+                            <a key={i} href={res.url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: '#fff', borderRadius: 'var(--radius-sm)', textDecoration: 'none', color: '#334155', border: '1px solid #e2e8f0', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {res.type === 'pdf' ? <FileText size={20} color="var(--primary)"/> : <PlayCircle size={20} color="var(--accent)"/>}
+                                <span style={{ fontWeight: 500 }}>{res.title}</span>
+                              </div>
+                              <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Open Resource &rarr;</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          ) : (
+            <div style={{ width: '100%', aspectRatio: '16/9', background: '#000', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+               <video src={course.videoUrl} controls poster={course.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          <div style={{ padding: '24px', background: '#fff', borderRadius: 'var(--radius-lg)', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '24px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', color: '#0f172a' }}>Course Syllabus</h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {course.modules && course.modules.length > 0 ? (
+                course.modules.map((mod, mIdx) => (
+                  <div key={mIdx}>
+                    <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '12px', fontSize: '1.05rem' }}>{mIdx + 1}. {mod.title}</div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '16px', borderLeft: '2px solid #e2e8f0' }}>
+                      {mod.topics?.map((topic, tIdx) => {
+                        const isActive = selectedModIdx === mIdx && selectedTopIdx === tIdx;
+                        return (
+                          <button 
+                            key={tIdx}
+                            onClick={() => {
+                               if (!user) { loginWithGoogle(); return; }
+                               setSelectedModIdx(mIdx); 
+                               setSelectedTopIdx(tIdx);
+                            }}
+                            style={{ 
+                              background: isActive ? '#f8fafc' : 'transparent', 
+                              border: 'none', textAlign: 'left',
+                              color: isActive ? 'var(--primary)' : '#64748b',
+                              fontWeight: isActive ? 600 : 400,
+                              cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', gap: '8px',
+                              padding: '8px 12px', borderRadius: 'var(--radius-sm)', transition: 'all 0.2s'
+                            }}
+                          >
+                            {!user ? <Lock size={14} color="#94a3b8" style={{ flexShrink: 0 }} /> : <PlayCircle size={14} color={isActive ? "var(--primary)" : "#94a3b8"} style={{ flexShrink: 0 }} />}
+                            <span style={{ lineHeight: 1.3 }}>{topic.title}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>No modules available.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="glass-card" style={{ padding: '24px', background: 'rgba(0,180,216,0.05)', border: '1px solid rgba(0,180,216,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <Info size={24} color="var(--primary)" />
+              <h3 style={{ fontSize: '1.1rem' }}>Practical Requirement</h3>
+            </div>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '20px' }}>
+              This course requires a mandatory in-person simulation session at an accredited lab.
+            </p>
+            <Link href="/labs" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
+              View Lab Availability
+            </Link>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="app/labs/page.js">
+"use client";
+import { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, MapPin, Search, Globe, Clock, ChevronRight, BookOpen } from 'lucide-react';
+import { useAuth } from '../../components/AuthProvider';
+import { collection, getDocs, query, where, doc, setDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+
+const generateMockSessions = (realCourses) => {
+  const sessions = [];
+  const today = new Date();
+  const labs = [
+    { id: 'l1', name: "Kampala Regional Referral Hospital", country: "Uganda", coords: "0.3476, 32.5825" },
+    { id: 'l2', name: "Nairobi Clinical Center", country: "Kenya", coords: "-1.2921, 36.8219" },
+    { id: 'l3', name: "Kigali General", country: "Rwanda", coords: "-1.9403, 30.0588" }
+  ];
+
+  if (!realCourses || realCourses.length === 0) return sessions;
+
+  for (let i = 1; i <= 14; i++) { // Next 14 days
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+    
+    // Assign some random sessions for this day
+    if (i % 2 === 0 || i % 3 === 0) {
+      // Pick a random course ID from the real database courses
+      const randomCourse = realCourses[i % realCourses.length];
+      sessions.push({
+        id: `s-${i}`,
+        date: dateStr,
+        courseId: randomCourse.id,
+        courseTitle: randomCourse.title,
+        lab: labs[i % 3],
+        blocks: [
+          { time: "09:00 AM", total: 10, booked: Math.floor(Math.random() * 11) },
+          { time: "02:00 PM", total: 15, booked: Math.floor(Math.random() * 16) }
+        ]
+      });
+    }
+  }
+  return sessions;
+};
+
+export default function LabsPage() {
+  const { user, profile, loginWithGoogle } = useAuth();
+  
+  const [courses, setCourses] = useState([]);
+  const [sessionsData, setSessionsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [myBookings, setMyBookings] = useState([]);
+  
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [bookingStatus, setBookingStatus] = useState(null);
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const q = query(collection(db, 'courses'), where('status', '==', 'Published'));
+        const querySnapshot = await getDocs(q);
+        const fetched = [];
+        querySnapshot.forEach((doc) => {
+          fetched.push({ id: doc.id, ...doc.data() });
+        });
+        setCourses(fetched);
+        setSessionsData(generateMockSessions(fetched));
+      } catch (err) {
+        console.error("Error fetching courses", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCourses();
+  }, []);
+
+  // Group sessions by available dates for the selected course
+  const availableDates = selectedCourse 
+    ? [...new Set(sessionsData.filter(s => s.courseId === selectedCourse).map(s => s.date))].sort()
+    : [];
+
+  const sessionsForDate = sessionsData.filter(s => 
+    s.courseId === selectedCourse && 
+    s.date === selectedDate &&
+    (s.lab.country.toLowerCase().includes(searchQuery.toLowerCase()) || 
+     s.lab.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const handleBook = async (sessionId, blockTime) => {
+    if (!user) {
+      alert("Please sign in to book a session.");
+      loginWithGoogle();
+      return;
+    }
+
+    setBookingStatus({ sessionId, time: blockTime, status: 'loading' });
+
+    setTimeout(() => {
+      // Decrement spots dynamically
+      setSessionsData(prev => prev.map(s => {
+        if (s.id === sessionId) {
+          const updatedBlocks = s.blocks.map(b => b.time === blockTime ? { ...b, booked: b.booked + 1 } : b);
+          return { ...s, blocks: updatedBlocks };
+        }
+        return s;
+      }));
+
+      // Add to my bookings
+      const sessionDetails = sessionsData.find(s => s.id === sessionId);
+      
+      setMyBookings(prev => [...prev, {
+        id: Date.now().toString(),
+        sessionId: sessionId,
+        time: blockTime,
+        courseTitle: sessionDetails.courseTitle,
+        date: sessionDetails.date,
+        location: sessionDetails.lab.name
+      }]);
+
+      setBookingStatus({ sessionId, time: blockTime, status: 'success' });
+
+      if (user && profile) {
+        const newNotif = { id: Date.now().toString(), text: `Booking Confirmed: ${sessionDetails.courseTitle} at ${blockTime}`, time: "Just now", read: false };
+        const currentNotifs = profile.notifications || [];
+        setDoc(doc(db, 'users', user.uid), { notifications: [...currentNotifs, newNotif] }, { merge: true });
+      }
+    }, 400); // Fast, snappy response
+  };
+
+  return (
+    <div className="animate-fade-in" style={{ paddingBottom: '80px' }}>
+      <header style={{ marginBottom: '40px' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>Simulation Lab Booking</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', marginBottom: '24px' }}>
+          Schedule hands-on practical sessions at accredited regional centers to complete your course requirements.
+        </p>
+      </header>
+
+      {myBookings.length > 0 && (
+        <section style={{ marginBottom: '40px' }} className="animate-fade-in">
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CalendarIcon size={24} color="var(--primary)" /> My Upcoming Labs
+          </h2>
+          <div className="grid-3">
+            {myBookings.map(booking => (
+              <div key={booking.id} className="glass-card" style={{ padding: '20px', borderLeft: '4px solid var(--success)' }}>
+                <p className="badge badge-success" style={{ marginBottom: '12px' }}>Confirmed</p>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', lineHeight: 1.3 }}>{booking.courseTitle}</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CalendarIcon size={14} /> {new Date(booking.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {booking.time}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={14} /> {booking.location}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="grid-2" style={{ gap: '40px', alignItems: 'start', gridTemplateColumns: '1fr 2fr' }}>
+        
+        {/* Step 1: Selection Sidebar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          <div className="glass-card" style={{ padding: '24px' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ background: 'var(--primary)', color: '#fff', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>1</span>
+              Select Course
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {loading ? (
+                <div style={{ padding: '20px', textAlign: 'center' }}><div className="spinner" style={{ width: '24px', height: '24px', borderWidth: '3px' }}></div></div>
+              ) : courses.length === 0 ? (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', padding: '12px' }}>No courses available.</p>
+              ) : (
+                courses.map(course => (
+                  <button 
+                    key={course.id}
+                    onClick={() => { setSelectedCourse(course.id); setSelectedDate(null); }}
+                    style={{ 
+                      textAlign: 'left', padding: '12px 16px', borderRadius: 'var(--radius-md)', 
+                      background: selectedCourse === course.id ? 'var(--primary-light)' : 'var(--surface)',
+                      border: `1px solid ${selectedCourse === course.id ? 'var(--primary)' : 'var(--border)'}`,
+                      color: selectedCourse === course.id ? 'var(--primary)' : 'var(--text-main)',
+                      cursor: 'pointer', transition: 'all 0.2s', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                    }}
+                  >
+                    <span style={{ fontWeight: selectedCourse === course.id ? 600 : 400 }}>{course.title}</span>
+                    {selectedCourse === course.id && <ChevronRight size={16} />}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="glass-card" style={{ padding: '24px', opacity: selectedCourse ? 1 : 0.5, pointerEvents: selectedCourse ? 'auto' : 'none' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ background: 'var(--primary)', color: '#fff', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold' }}>2</span>
+              Select Date
+            </h3>
+            
+            {availableDates.length > 0 ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                {availableDates.map(date => {
+                  const d = new Date(date);
+                  const formatted = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                  return (
+                    <button 
+                      key={date}
+                      onClick={() => setSelectedDate(date)}
+                      style={{ 
+                        padding: '12px', borderRadius: 'var(--radius-md)', textAlign: 'center',
+                        background: selectedDate === date ? 'var(--primary)' : 'var(--surface)',
+                        color: selectedDate === date ? '#fff' : 'var(--text-main)',
+                        border: `1px solid ${selectedDate === date ? 'var(--primary)' : 'var(--border)'}`,
+                        cursor: 'pointer', transition: 'all 0.2s', fontSize: '0.9rem', fontWeight: 500
+                      }}
+                    >
+                      {formatted}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : selectedCourse ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '20px 0' }}>No upcoming sessions for this course.</p>
+            ) : (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '20px 0' }}>Select a course first.</p>
+            )}
+          </div>
+
+        </div>
+
+        {/* Step 3: Main Display Area */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
+            <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ background: 'var(--primary)', color: '#fff', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 'bold' }}>3</span>
+              Available Centers
+            </h2>
+            <div className="input-group" style={{ width: '250px', position: 'relative' }}>
+              <Search size={18} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
+              <input 
+                type="text" 
+                placeholder="Filter by country..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ paddingLeft: '40px', height: '40px', fontSize: '0.9rem', marginBottom: 0 }}
+                disabled={!selectedDate}
+              />
+            </div>
+          </div>
+
+          {!selectedCourse || !selectedDate ? (
+            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--surface)', borderRadius: 'var(--radius-md)' }}>
+              <CalendarIcon size={64} color="var(--border)" style={{ margin: '0 auto 16px' }} />
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--text-muted)' }}>No Date Selected</h3>
+              <p style={{ color: 'var(--text-muted)' }}>Please select a course and a date from the sidebar to view available lab sessions.</p>
+            </div>
+          ) : sessionsForDate.length === 0 ? (
+            <div style={{ padding: '60px 20px', textAlign: 'center', background: 'var(--surface)', borderRadius: 'var(--radius-md)' }}>
+              <Globe size={48} color="var(--text-muted)" style={{ margin: '0 auto 16px' }} />
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>No centers found</h3>
+              <p style={{ color: 'var(--text-muted)' }}>We could not find any simulation centers matching your criteria on this date.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {sessionsForDate.map((session, idx) => (
+                <div key={session.id} className={`glass-card delay-${idx + 1} animate-fade-in`} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--accent)' }} />
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div className="badge badge-primary" style={{ marginBottom: '8px' }}>{session.lab.country}</div>
+                      <h3 style={{ fontSize: '1.25rem', display: 'flex', gap: '8px', alignItems: 'flex-start', color: 'var(--text-main)' }}>
+                        <MapPin size={20} color="var(--accent)" style={{ flexShrink: 0, marginTop: '4px' }} />
+                        {session.lab.name}
+                      </h3>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <h4 style={{ fontSize: '1rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>Available Time Blocks</h4>
+                    
+                    {session.blocks.map((block, bIdx) => {
+                      const isFull = block.booked >= block.total;
+                      const isMyBooking = myBookings.some(b => b.sessionId === session.id && b.time === block.time);
+                      const isLoading = bookingStatus?.sessionId === session.id && bookingStatus?.time === block.time && bookingStatus?.status === 'loading';
+                      const isSuccess = isMyBooking || (bookingStatus?.sessionId === session.id && bookingStatus?.time === block.time && bookingStatus?.status === 'success');
+
+                      return (
+                        <div key={bIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface)', padding: '16px', borderRadius: 'var(--radius-md)', border: isSuccess ? '1px solid var(--success)' : '1px solid var(--border)', transition: 'all 0.2s' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Clock size={20} color={isFull && !isSuccess ? "var(--text-muted)" : "var(--primary)"} />
+                            <div>
+                              <p style={{ fontWeight: 600, color: isFull && !isSuccess ? 'var(--text-muted)' : 'var(--text-main)', fontSize: '1.1rem' }}>{block.time}</p>
+                              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Instructor-led simulation</p>
+                            </div>
+                          </div>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ fontSize: '0.9rem', fontWeight: 600, color: isSuccess ? 'var(--success)' : isFull ? 'var(--danger)' : 'var(--success)' }}>
+                                {isSuccess ? 'Your Spot Secured' : isFull ? 'Session Full' : `${block.total - block.booked} seats left`}
+                              </p>
+                              {!isSuccess && (
+                                <div style={{ width: '100px', height: '4px', background: 'var(--border)', borderRadius: '2px', marginTop: '6px', overflow: 'hidden' }}>
+                                  <div style={{ width: `${(block.booked / block.total) * 100}%`, height: '100%', background: isFull ? 'var(--danger)' : 'var(--success)' }} />
+                                </div>
+                              )}
+                            </div>
+                            <button 
+                              className={`btn ${isSuccess ? 'btn-success' : isFull ? 'btn-secondary' : 'btn-primary'}`}
+                              style={{ padding: '8px 24px', width: '140px', opacity: isFull && !isSuccess ? 0.6 : 1, background: isSuccess ? 'var(--success)' : undefined, color: isSuccess ? '#fff' : undefined }}
+                              disabled={isFull || isLoading || isSuccess}
+                              onClick={() => handleBook(session.id, block.time)}
+                            >
+                              {isLoading ? <div className="spinner" style={{width: '16px', height: '16px', borderWidth: '2px', borderColor: '#fff', borderTopColor: 'transparent'}}/> : isSuccess ? 'Booked' : isFull ? 'Waitlist' : 'Book Session'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="app/practitioners/page.js">
+"use client";
+import { useState, useEffect } from 'react';
+import { Award, Search, ShieldCheck, MapPin } from 'lucide-react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+import { useAuth } from '../../components/AuthProvider';
+
+export default function PractitionersDirectory() {
+  const [practitioners, setPractitioners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    async function fetchPublicProfiles() {
+      try {
+        const q = query(collection(db, 'users'), where('isPublic', '==', true));
+        const snapshot = await getDocs(q);
+        const fetched = [];
+        snapshot.forEach(doc => {
+          fetched.push({ id: doc.id, ...doc.data() });
+        });
+        
+        setPractitioners(fetched);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPublicProfiles();
+  }, []);
+
+  const filtered = practitioners.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()) || p.role?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  return (
+    <div className="animate-fade-in" style={{ paddingBottom: '60px' }}>
+      <header style={{ textAlign: 'center', marginBottom: '40px', maxWidth: '800px', margin: '0 auto 40px' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Public Practitioner Directory</h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Find verified medical professionals with certified CPD points and specialized training on the Pamoja platform.</p>
+        
+        <div className="input-group" style={{ position: 'relative', marginTop: '32px', maxWidth: '500px', margin: '32px auto 0' }}>
+          <Search size={20} style={{ position: 'absolute', left: '16px', top: '16px', color: 'var(--text-muted)' }} />
+          <input 
+            type="text" 
+            placeholder="Search by name, role, or specialty..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ paddingLeft: '48px', fontSize: '1.1rem', borderRadius: '40px' }} 
+          />
+        </div>
+      </header>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '60px' }}><div className="spinner"></div></div>
+      ) : filtered.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
+          <h3>No public practitioners found.</h3>
+          <p>Be the first to make your portfolio public from your Profile page!</p>
+        </div>
+      ) : (
+        <div className="grid-3">
+          {filtered.map(p => (
+            <div key={p.id} className="glass-card" style={{ textAlign: 'center', padding: '32px', position: 'relative' }}>
+              <img 
+                src={p.photoURL || `https://ui-avatars.com/api/?name=${p.name}&background=00b4d8&color=fff`}
+                alt={p.name}
+                style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 16px', border: '3px solid var(--surface-hover)' }}
+              />
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '4px' }}>{p.name}</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>{p.role || 'Verified Practitioner'}</p>
+              
+              {p.location && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '16px' }}>
+                  <MapPin size={14} /> {p.location}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '24px', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '12px 0' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary)' }}>{p.cpdPoints || 0}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>CPD Points</div>
+                </div>
+                <div style={{ width: '1px', background: 'var(--border)' }}></div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--success)' }}>{p.badges?.length || 0}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Badges</div>
+                </div>
+              </div>
+
+              <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>View Full Profile</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="app/profile/page.js">
+"use client";
+import { useAuth } from '../../components/AuthProvider';
+import { Award, ShieldCheck, Clock, FileText, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+
+// Mock data for demonstration until Firestore is populated
+const mockCertificates = [
+  { id: 'cert_88291a', name: 'Advanced PPH Intervention Masterclass', date: '2026-05-12', hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
+];
+
+const mockPoints = [
+  { id: 1, source: 'Neonatal Resuscitation', points: 1.5, expires: '2027-01-15' },
+  { id: 2, source: 'Infection Control', points: 1.0, expires: '2028-08-01' }, // Fixed false alarm
+];
+
+export default function ProfilePage() {
+  const { user, profile } = useAuth();
+  const [isPublic, setIsPublic] = useState(false);
+
+  useEffect(() => {
+    if (profile?.isPublic !== undefined) {
+      setIsPublic(profile.isPublic);
+    }
+  }, [profile]);
+
+  const handleTogglePublic = async () => {
+    const newValue = !isPublic;
+    setIsPublic(newValue);
+    if (user) {
+      await setDoc(doc(db, 'users', user.uid), { isPublic: newValue }, { merge: true });
+    }
+  };
+
+  if (!user || !profile) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px' }}>
+        <h2 style={{ marginBottom: '16px' }}>Please Sign In</h2>
+        <p style={{ color: 'var(--text-muted)' }}>You need to be logged in to view your profile and CPD points.</p>
+      </div>
+    );
+  }
+
+  const expiringSoon = mockPoints.filter(p => new Date(p.expires) < new Date(new Date().setMonth(new Date().getMonth() + 2)));
+
+  return (
+    <div className="animate-fade-in">
+      <header style={{ marginBottom: '40px', display: 'flex', gap: '32px', alignItems: 'center' }}>
+        <img 
+          src={profile.photoURL || `https://ui-avatars.com/api/?name=${profile.name}&background=00b4d8&color=fff`} 
+          alt="Profile" 
+          style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '4px solid var(--surface)' }} 
+        />
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>{profile.name}</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '16px' }}>{profile.email} • Verified Practitioner</p>
+          
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div className="badge badge-primary" style={{ fontSize: '1rem', padding: '8px 16px' }}>
+              <Award size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
+              {profile.cpdPoints} CPD Points Total
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-muted)' }}>
+              <input type="checkbox" checked={isPublic} onChange={handleTogglePublic} />
+              Make Portfolio Public
+            </label>
+          </div>
+        </div>
+      </header>
+
+      {expiringSoon.length > 0 && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', padding: '20px', borderRadius: 'var(--radius-md)', marginBottom: '40px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          <AlertTriangle color="var(--danger)" style={{ flexShrink: 0 }} />
+          <div>
+            <h3 style={{ color: 'var(--danger)', marginBottom: '4px' }}>Action Required: Compliance Expirations</h3>
+            <p style={{ color: 'var(--text-main)', marginBottom: '12px' }}>Some of your certified points are expiring soon. National board compliance requires you to take a re-test or book a refresher practical lab.</p>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              {expiringSoon.map(p => (
+                <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  <strong>{p.source}</strong>
+                  <span style={{ color: 'var(--danger)' }}>Expires: {p.expires}</span>
+                </li>
+              ))}
+            </ul>
+            <button className="btn btn-secondary" style={{ marginTop: '16px', borderColor: 'var(--danger)', color: 'var(--danger)' }}>Book Refresher Lab</button>
+          </div>
+        </div>
+      )}
+
+      <div className="grid-2">
+        <section className="glass-card">
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FileText size={24} color="var(--primary)" /> Verifiable Certificates
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {mockCertificates.map(cert => (
+              <div key={cert.id} style={{ padding: '16px', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', background: 'var(--surface)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.1rem' }}>{cert.name}</h3>
+                  <span style={{ color: 'var(--text-muted)' }}>{cert.date}</span>
+                </div>
+                <div style={{ background: 'var(--background)', padding: '8px', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-muted)', overflowWrap: 'break-word' }}>
+                  SHA-256: {cert.hash}
+                </div>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                  <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.85rem' }}><ShieldCheck size={16}/> Verify</button>
+                  <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>Download PDF</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="glass-card">
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Award size={24} color="var(--primary)" /> Achievement Badges
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ padding: '20px', textAlign: 'center', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', background: 'var(--surface-hover)' }}>
+              <div style={{ width: '60px', height: '60px', margin: '0 auto 12px', background: 'linear-gradient(135deg, #ffb703, #fb8500)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                <Award size={32} />
+              </div>
+              <h4 style={{ marginBottom: '4px' }}>Neonatal Saver</h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Completed 3 Neonatology Modules</p>
+            </div>
+            
+            <div style={{ padding: '20px', textAlign: 'center', border: '1px dashed var(--border)', borderRadius: 'var(--radius-md)', background: 'var(--background)', opacity: 0.6 }}>
+              <div style={{ width: '60px', height: '60px', margin: '0 auto 12px', background: 'var(--border)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                <ShieldCheck size={32} />
+              </div>
+              <h4 style={{ marginBottom: '4px' }}>Infection Master</h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>2/5 Modules Completed</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="app/studio/page.js">
+"use client";
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../components/AuthProvider';
+import { PlusCircle, Video, FileText, Settings, ShieldCheck, CheckCircle, Edit3, Trash2, Save, X, Users, Image as ImageIcon, Check, Plus, GripVertical } from 'lucide-react';
+import { collection, getDocs, doc, setDoc, deleteDoc, query, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
+
+export default function EducatorStudio() {
+  const { user, profile, loginWithGoogle } = useAuth();
+  const [activeTab, setActiveTab] = useState('courses');
+  
+  // Data State
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Real-time listener for courses
+  useEffect(() => {
+    if (!user || !profile) return;
+    const q = query(collection(db, 'courses'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedCourses = [];
+      snapshot.forEach(doc => fetchedCourses.push({ id: doc.id, ...doc.data() }));
+      setCourses(fetchedCourses);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user, profile]);
+
+  const [mockUsers, setMockUsers] = useState([
+    { id: '1', name: 'Alice Smith', email: 'alice@example.com', role: 'learner', status: 'Active' },
+    { id: '2', name: 'Bob Jones', email: 'bob@example.com', role: 'creator', status: 'Active' }
+  ]);
+
+  // Editor State
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [isCreating, setIsCreating] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  if (!user || !profile || (profile.role !== 'creator' && profile.role !== 'superuser')) {
+    return (
+      <div style={{ textAlign: 'center', padding: '80px 20px', maxWidth: '700px', margin: '0 auto' }} className="animate-fade-in">
+        <div style={{ background: '#fff', borderRadius: 'var(--radius-lg)', padding: '60px 40px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
+          <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(0,180,216,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Users size={40} color="var(--primary)" />
+          </div>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '16px', color: '#0f172a', fontWeight: 700 }}>Become an Educator</h2>
+          <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '40px', lineHeight: 1.6 }}>
+            Join our network of healthcare professionals and share your expertise. Create courses, manage simulation labs, and empower the next generation of medical practitioners.
+          </p>
+          
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            {!user ? (
+              <button onClick={() => {
+                // Because loginWithGoogle isn't exposed in this scope yet, we need to get it from useAuth
+                // Wait, useAuth gives us user, profile... we didn't destructure loginWithGoogle!
+                // We must ensure loginWithGoogle is destructured from useAuth.
+                loginWithGoogle();
+              }} className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
+                Sign In to Apply
+              </button>
+            ) : (
+              <button className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
+                Apply for Creator Access
+              </button>
+            )}
+            <button className="btn btn-secondary" style={{ padding: '16px 32px', fontSize: '1.1rem', background: '#f8fafc' }}>
+              Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isSuperuser = profile.role === 'superuser';
+  const displayedCourses = isSuperuser ? courses : courses.filter(c => c.creatorId === user?.uid);
+
+
+  const handleStartEdit = (course) => {
+    setEditingId(course.id);
+    setEditForm({
+      ...course,
+      modules: course.modules || []
+    });
+    setIsCreating(false);
+    setImgError(false);
+  };
+
+  const handleStartCreate = () => {
+    setIsCreating(true);
+    setEditingId(null);
+    setImgError(false);
+    setEditForm({
+      title: "",
+      description: "",
+      duration: "",
+      cpd: "",
+      category: "Maternal Health",
+      image: "",
+      videoUrl: "",
+      status: "Draft",
+      creatorId: user.uid,
+      modules: []
+    });
+  };
+
+  const handleSave = async () => {
+    const finalForm = { ...editForm, status: editForm.status === 'Draft' ? 'Pending Approval' : editForm.status, updatedAt: serverTimestamp() };
+    if (isCreating) {
+      finalForm.createdAt = serverTimestamp();
+      const newRef = doc(collection(db, 'courses'));
+      await setDoc(newRef, finalForm);
+    } else {
+      await setDoc(doc(db, 'courses', String(editingId)), finalForm, { merge: true });
+    }
+    setEditingId(null);
+    setIsCreating(false);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Delete this course permanently?")) {
+      await deleteDoc(doc(db, 'courses', id));
+    }
+  };
+
+  const handleApprove = async (id) => {
+    await setDoc(doc(db, 'courses', id), { status: 'Published' }, { merge: true });
+  };
+
+  const handleSuspendUser = (id) => {
+    setMockUsers(mockUsers.map(u => u.id === id ? { ...u, status: u.status === 'Active' ? 'Suspended' : 'Active' } : u));
+  };
+
+  const handleChange = (e) => setEditForm({ ...editForm, [e.target.name]: e.target.value });
+
+  // Hierarchical State Handlers
+  const addModule = () => {
+    setEditForm({ ...editForm, modules: [...(editForm.modules || []), { id: Date.now().toString(), title: "New Module", topics: [] }] });
+  };
+  const updateModuleTitle = (modIdx, value) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].title = value;
+    setEditForm({ ...editForm, modules: mods });
+  };
+  const removeModule = (modIdx) => {
+    setEditForm({ ...editForm, modules: editForm.modules.filter((_, i) => i !== modIdx) });
+  };
+
+  const addTopic = (modIdx) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].topics.push({ id: Date.now().toString(), title: "New Topic", content: "", resources: [] });
+    setEditForm({ ...editForm, modules: mods });
+  };
+  const updateTopic = (modIdx, topIdx, field, value) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].topics[topIdx][field] = value;
+    setEditForm({ ...editForm, modules: mods });
+  };
+  const removeTopic = (modIdx, topIdx) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].topics.splice(topIdx, 1);
+    setEditForm({ ...editForm, modules: mods });
+  };
+
+  const addResource = (modIdx, topIdx) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].topics[topIdx].resources.push({ id: Date.now().toString(), title: "New Resource", type: "pdf", url: "" });
+    setEditForm({ ...editForm, modules: mods });
+  };
+  const updateResource = (modIdx, topIdx, resIdx, field, value) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].topics[topIdx].resources[resIdx][field] = value;
+    setEditForm({ ...editForm, modules: mods });
+  };
+  const removeResource = (modIdx, topIdx, resIdx) => {
+    const mods = [...editForm.modules];
+    mods[modIdx].topics[topIdx].resources.splice(resIdx, 1);
+    setEditForm({ ...editForm, modules: mods });
+  };
+
+  return (
+    <div className="animate-fade-in" style={{ display: 'flex', gap: '40px', paddingBottom: '80px' }}>
+      <aside style={{ width: '250px', display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+        <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '16px', paddingLeft: '16px' }}>My Studio</h3>
+        <button onClick={() => setActiveTab('courses')} className={`btn ${activeTab === 'courses' ? 'btn-primary' : ''}`} style={{ justifyContent: 'flex-start', background: activeTab === 'courses' ? '' : 'transparent', color: activeTab === 'courses' ? '#fff' : 'var(--text-main)', boxShadow: 'none' }}><Video size={18} /> My Courses</button>
+        <button onClick={() => setActiveTab('resources')} className={`btn ${activeTab === 'resources' ? 'btn-primary' : ''}`} style={{ justifyContent: 'flex-start', background: activeTab === 'resources' ? '' : 'transparent', color: activeTab === 'resources' ? '#fff' : 'var(--text-main)', boxShadow: 'none' }}><FileText size={18} /> Asset Library</button>
+
+        {isSuperuser && (
+          <>
+            <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '1px', margin: '24px 0 16px', paddingLeft: '16px' }}>Superuser Admin</h3>
+            <button onClick={() => setActiveTab('admin_courses')} className={`btn ${activeTab === 'admin_courses' ? 'btn-primary' : ''}`} style={{ justifyContent: 'flex-start', background: activeTab === 'admin_courses' ? '' : 'transparent', color: activeTab === 'admin_courses' ? '#fff' : 'var(--text-main)', boxShadow: 'none' }}><ShieldCheck size={18} /> Global Approvals</button>
+            <button onClick={() => setActiveTab('admin_users')} className={`btn ${activeTab === 'admin_users' ? 'btn-primary' : ''}`} style={{ justifyContent: 'flex-start', background: activeTab === 'admin_users' ? '' : 'transparent', color: activeTab === 'admin_users' ? '#fff' : 'var(--text-main)', boxShadow: 'none' }}><Users size={18} /> User Management</button>
+          </>
+        )}
+      </aside>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid var(--border)', paddingBottom: '24px' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>
+              {activeTab === 'admin_courses' ? 'Global Course Approvals' : activeTab === 'admin_users' ? 'Platform Users' : 'Course Manager'}
+            </h1>
+            <p style={{ color: 'var(--text-muted)' }}>
+              {activeTab === 'admin_courses' ? 'Review, approve, or reject courses submitted by creators.' : activeTab === 'admin_users' ? 'Manage roles, suspend accounts, and resolve disputes.' : 'Draft, build, and publish your educational content hierarchically.'}
+            </p>
+          </div>
+          {activeTab === 'courses' && !isCreating && !editingId && (
+            <button className="btn btn-primary" onClick={handleStartCreate} style={{ padding: '12px 24px' }}>
+              <PlusCircle size={20} /> Create Course
+            </button>
+          )}
+        </header>
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px' }}><div className="spinner"></div></div>
+        ) : activeTab === 'admin_users' && isSuperuser ? (
+          <div className="glass-card" style={{ overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: 'var(--surface-hover)', borderBottom: '1px solid var(--border)' }}>
+                  <th style={{ padding: '16px' }}>Name / Email</th><th style={{ padding: '16px' }}>Role</th><th style={{ padding: '16px' }}>Status</th><th style={{ padding: '16px' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockUsers.map(u => (
+                  <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '16px' }}><div style={{ fontWeight: 600 }}>{u.name}</div><div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{u.email}</div></td>
+                    <td style={{ padding: '16px' }}><span className="badge badge-warning">{u.role}</span></td>
+                    <td style={{ padding: '16px' }}><span className={`badge ${u.status === 'Active' ? 'badge-success' : 'badge-primary'}`} style={{ background: u.status === 'Suspended' ? 'var(--danger)' : undefined }}>{u.status}</span></td>
+                    <td style={{ padding: '16px' }}><button onClick={() => handleSuspendUser(u.id)} className="btn btn-secondary">{u.status === 'Active' ? 'Suspend' : 'Activate'}</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (editingId || isCreating) ? (
+          <section className="glass-card animate-fade-in" style={{ padding: '32px', marginBottom: '40px', border: '1px solid var(--primary)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}><Edit3 size={24} color="var(--primary)" /> {isCreating ? 'Create New Course' : 'Course Builder'}</h2>
+              <div className={`badge ${editForm.status === 'Published' ? 'badge-success' : 'badge-warning'}`}>{editForm.status || 'Draft'}</div>
+            </div>
+
+            <div className="grid-2" style={{ marginBottom: '32px', gap: '24px' }}>
+              <div className="input-group" style={{ gridColumn: '1 / -1' }}><label>Course Title</label><input type="text" name="title" value={editForm.title || ''} onChange={handleChange} placeholder="e.g. Advanced PPH Intervention" style={{ fontSize: '1.2rem', padding: '12px' }} /></div>
+              <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                <label>Header Image URL</label>
+                <input type="text" name="image" value={editForm.image || ''} onChange={(e) => { handleChange(e); setImgError(false); }} placeholder="https://images.unsplash.com/..." />
+                <div style={{ marginTop: '12px', height: '160px', width: '100%', borderRadius: 'var(--radius-md)', border: '1px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: 'var(--surface)' }}>
+                  {editForm.image && !imgError ? <img src={editForm.image} alt="Preview" onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}><ImageIcon size={32} /><span>{imgError ? 'Image failed to load' : 'Image Preview'}</span></div>}
+                </div>
+              </div>
+              <div className="input-group"><label>Category</label><input type="text" name="category" value={editForm.category || ''} onChange={handleChange} /></div>
+              <div className="input-group"><label>Demo Video URL</label><input type="text" name="videoUrl" value={editForm.videoUrl || ''} onChange={handleChange} /></div>
+              <div className="input-group"><label>Total Duration</label><input type="text" name="duration" value={editForm.duration || ''} onChange={handleChange} /></div>
+              <div className="input-group"><label>CPD Points</label><input type="text" name="cpd" value={editForm.cpd || ''} onChange={handleChange} /></div>
+              <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                <label>Course Description</label>
+                <textarea name="description" value={editForm.description || ''} onChange={handleChange} style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', fontFamily: 'var(--font-base)', minHeight: '120px' }} />
+              </div>
+            </div>
+
+            {/* DEEP HIERARCHICAL BUILDER */}
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '32px', marginBottom: '32px' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}><FileText size={20} color="var(--primary)" /> Course Content Structure</h3>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>Build your course out infinitely: Modules &rarr; Topics &rarr; Rich Text Content & Resources.</p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', marginBottom: '24px' }}>
+                {editForm.modules?.map((mod, mIdx) => (
+                  <div key={mod.id || mIdx} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '24px', position: 'relative' }}>
+                    <button onClick={() => removeModule(mIdx)} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                    
+                    <div className="input-group">
+                      <label style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 600 }}>MODULE {mIdx + 1} TITLE</label>
+                      <input type="text" value={mod.title || ''} onChange={(e) => updateModuleTitle(mIdx, e.target.value)} style={{ padding: '12px', fontSize: '1.1rem', fontWeight: 600 }} placeholder="e.g. Introduction to Protocols" />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '24px', marginLeft: '24px', borderLeft: '2px solid var(--border)', paddingLeft: '24px' }}>
+                      {mod.topics?.map((topic, tIdx) => (
+                        <div key={topic.id || tIdx} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '16px', position: 'relative' }}>
+                          <button onClick={() => removeTopic(mIdx, tIdx)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={16} /></button>
+                          
+                          <div className="input-group" style={{ marginBottom: '16px' }}>
+                            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>TOPIC TITLE</label>
+                            <input type="text" value={topic.title || ''} onChange={(e) => updateTopic(mIdx, tIdx, 'title', e.target.value)} style={{ padding: '8px' }} placeholder="e.g. The first 5 minutes" />
+                          </div>
+
+                          <div className="input-group" style={{ marginBottom: '16px' }}>
+                            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>RICH TEXT CONTENT</label>
+                            <textarea value={topic.content || ''} onChange={(e) => updateTopic(mIdx, tIdx, 'content', e.target.value)} style={{ width: '100%', padding: '12px', minHeight: '120px', borderRadius: '4px', background: 'var(--background)', color: 'var(--text-main)', border: '1px solid var(--border)' }} placeholder="Add formatted text, instructions, and teaching notes here..." />
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                            {topic.resources?.map((res, rIdx) => (
+                              <div key={res.id || rIdx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <GripVertical size={14} color="var(--text-muted)" />
+                                <select value={res.type || 'video'} onChange={(e) => updateResource(mIdx, tIdx, rIdx, 'type', e.target.value)} style={{ padding: '6px', fontSize: '0.8rem' }}>
+                                  <option value="video">Video</option>
+                                  <option value="pdf">PDF</option>
+                                  <option value="audio">Audio</option>
+                                </select>
+                                <input type="text" value={res.title || ''} onChange={(e) => updateResource(mIdx, tIdx, rIdx, 'title', e.target.value)} placeholder="Resource Title" style={{ padding: '6px', fontSize: '0.8rem', flex: 1 }} />
+                                <input type="text" value={res.url || ''} onChange={(e) => updateResource(mIdx, tIdx, rIdx, 'url', e.target.value)} placeholder="URL link..." style={{ padding: '6px', fontSize: '0.8rem', flex: 2 }} />
+                                <button onClick={() => removeResource(mIdx, tIdx, rIdx)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer' }}><X size={14}/></button>
+                              </div>
+                            ))}
+                          </div>
+
+                          <button className="btn btn-secondary" onClick={() => addResource(mIdx, tIdx)} style={{ padding: '6px 12px', fontSize: '0.8rem' }}><Plus size={14}/> Add Resource</button>
+                        </div>
+                      ))}
+                      <button className="btn btn-secondary" onClick={() => addTopic(mIdx)} style={{ alignSelf: 'flex-start', borderStyle: 'dashed' }}><PlusCircle size={16} /> Add Topic</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button className="btn btn-primary" onClick={addModule} style={{ width: '100%', justifyContent: 'center', padding: '16px', background: 'rgba(0,180,216,0.1)', color: 'var(--primary)' }}><PlusCircle size={20} /> Add New Module</button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', borderTop: '1px solid var(--border)', paddingTop: '24px' }}>
+              <button className="btn btn-secondary" onClick={() => {setEditingId(null); setIsCreating(false);}}><X size={20} /> Cancel</button>
+              <button className="btn btn-primary" onClick={handleSave}><Save size={20} /> {isCreating ? 'Save & Submit' : 'Save Changes'}</button>
+            </div>
+          </section>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {displayedCourses.length === 0 && courses.length === 0 && isSuperuser && (
+              <div style={{ textAlign: 'center', padding: '40px', background: 'rgba(255, 183, 3, 0.1)', borderRadius: 'var(--radius-md)', border: '1px dashed #ffb703', marginBottom: '24px' }}>
+                <p style={{ color: '#fb8500', marginBottom: '16px' }}>Database is empty.</p>
+              </div>
+            )}
+            
+            {displayedCourses.map((course) => (
+              <div key={course.id} className="glass-card" style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  <div style={{ width: '120px', height: '80px', borderRadius: 'var(--radius-sm)', background: 'var(--surface-hover)', overflow: 'hidden' }}>
+                    {course.image ? <img src={course.image} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={32} color="var(--text-muted)" style={{ margin: '24px auto', display: 'block' }} />}
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '4px' }}>
+                      <h3 style={{ fontSize: '1.25rem' }}>{course.title}</h3>
+                      <span className={`badge ${course.status === 'Published' ? 'badge-success' : course.status === 'Pending Approval' ? 'badge-warning' : 'badge-primary'}`} style={{ fontSize: '0.7rem' }}>{course.status}</span>
+                    </div>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', gap: '12px', marginBottom: '8px' }}>
+                      <span>{course.category}</span><span>•</span><span>{course.duration}</span><span>•</span><span>{course.modules?.length || 0} Modules</span>
+                    </p>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {isSuperuser && activeTab === 'admin_courses' && course.status === 'Pending Approval' && <button onClick={() => handleApprove(course.id)} className="btn btn-success" style={{ padding: '8px 16px' }}><Check size={18} /> Approve</button>}
+                  <button onClick={() => handleStartEdit(course)} className="btn btn-secondary" style={{ padding: '8px', color: 'var(--primary)' }}><Edit3 size={18} /></button>
+                  <button onClick={() => handleDelete(course.id)} className="btn btn-secondary" style={{ padding: '8px', color: 'var(--danger)' }}><Trash2 size={18} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="app/globals.css">
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
+
+:root {
+  /* Core Palette */
+  --primary: #00b4d8;       /* vibrant medical cyan */
+  --primary-dark: #0077b6;
+  --secondary: #219ebc;
+  --accent: #ffb703;        /* warm accent */
+  --success: #10b981;
+  --danger: #ef4444;
+  --surface: #ffffff;
+  --surface-hover: #f8fafc;
+  --background: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+
+  /* Typography */
+  --font-base: 'Inter', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+
+  /* Spacing & Borders */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #48cae4;
+    --primary-dark: #0096c7;
+    --background: #0b1121;
+    --surface: #1e293b;
+    --surface-hover: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-base);
+  background-color: var(--background);
+  color: var(--text-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-main);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+/* Utilities */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Glass Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: var(--transition);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--surface-hover);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #000;
+}
+
+/* Layouts */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.badge-primary { background: rgba(0, 180, 216, 0.1); color: var(--primary); }
+.badge-warning { background: rgba(255, 183, 3, 0.1); color: var(--accent); }
+
+/* Navigation */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 16px 0;
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; opacity: 0; }
+.delay-2 { animation-delay: 0.2s; opacity: 0; }
+.delay-3 { animation-delay: 0.3s; opacity: 0; }
+
+/* Custom Inputs */
+.input-group {
+  margin-bottom: 20px;
+}
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+.input-group input, .input-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-main);
+  font-family: var(--font-base);
+  transition: var(--transition);
+}
+.input-group input:focus, .input-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0, 180, 216, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Subtle Gradient Text for Headers */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+</file>
+
+<file path="app/layout.js">
+import "./globals.css";
+import Navbar from "../components/Navbar";
+import { AuthProvider } from "../components/AuthProvider";
+import AIAssistant from "../components/AIAssistant";
+import Footer from "../components/Footer";
+
+export const metadata = {
+  title: "Pamoja Platform",
+  description: "Offline-first medical training and simulation lab scheduling platform.",
+  manifest: "/manifest.json",
+};
+
+export const viewport = {
+  themeColor: "#00b4d8",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <AuthProvider>
+          <Navbar />
+          <main className="container" style={{ padding: '40px 24px', flex: 1 }}>
+            {children}
+          </main>
+          <Footer />
+          <AIAssistant />
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+</file>
+
+<file path="app/page.js">
+"use client";
+import { PlayCircle, Clock, Award, ArrowRight, Shield, Zap, Target, Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../components/AuthProvider';
+import Link from 'next/link';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+
+function CourseImage({ src, alt }) {
+  const [error, setError] = useState(false);
+  
+  if (error || !src) {
+    return (
+      <div style={{ width: '100%', height: '100%', background: 'var(--surface-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+        <ImageIcon size={48} />
+      </div>
+    );
+  }
+  
+  return <img src={src} alt={alt} onError={() => setError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
+}
+
+export default function Home() {
+  const { user, profile, loading: authLoading } = useAuth();
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const q = query(collection(db, 'courses'), where('status', '==', 'Published'));
+        const querySnapshot = await getDocs(q);
+        const fetched = [];
+        querySnapshot.forEach((doc) => {
+          fetched.push({ id: doc.id, ...doc.data() });
+        });
+        // Only show actual DB courses
+        setCourses(fetched);
+      } catch (err) {
+        console.error("Error fetching courses", err);
+        setCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCourses();
+  }, []);
+  
+  if (authLoading || loading) {
+    return <div style={{display: 'flex', justifyContent: 'center', padding: '100px'}}><div className="spinner"></div></div>;
+  }
+
+  if (!user) {
+    return <MarketingLanding courses={courses} />;
+  }
+
+  return <Dashboard user={user} profile={profile} courses={courses} />;
+}
+
+function MarketingLanding({ courses }) {
+  const { loginWithGoogle } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const categories = ["All", "Marketing", "Design", "Development", "IT & Software", "Photography", "Business"];
+  const [activeCategory, setActiveCategory] = useState("All");
+  
+  return (
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '80px', paddingBottom: '80px', background: '#fff' }}>
+      {/* Bright Hero Section */}
+      <section style={{ textAlign: 'center', padding: '100px 20px', background: '#f8fafc', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '4rem', marginBottom: '16px', lineHeight: 1.1, color: '#0f172a' }}>
+            Learn Something <br/> <span style={{ color: 'var(--primary)' }}>New</span> Today
+          </h1>
+          <p style={{ fontSize: '1.2rem', color: '#64748b', marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
+            Discover top medical and professional courses taught by industry experts.
+          </p>
+          
+          <div style={{ display: 'flex', maxWidth: '600px', margin: '0 auto', position: 'relative' }}>
+            <input 
+              type="text" 
+              placeholder="What do you want to learn?"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: '100%', padding: '16px 24px', fontSize: '1rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)', background: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}
+            />
+            <button className="btn btn-primary" style={{ position: 'absolute', right: '6px', top: '6px', bottom: '6px', borderRadius: 'var(--radius-full)', padding: '0 24px' }}>
+              Search
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Course Grid Area */}
+      <section className="container">
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '24px', color: '#0f172a' }}>Most Popular Courses</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {categories.map(cat => (
+              <button 
+                key={cat} 
+                onClick={() => setActiveCategory(cat)}
+                style={{ 
+                  padding: '8px 20px', 
+                  borderRadius: 'var(--radius-full)', 
+                  border: activeCategory === cat ? 'none' : '1px solid var(--border)', 
+                  background: activeCategory === cat ? 'var(--primary)' : '#fff',
+                  color: activeCategory === cat ? '#fff' : '#64748b',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  transition: 'all 0.2s'
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid-3" style={{ gap: '30px' }}>
+          {courses.map((course, idx) => (
+            <Link href={`/courses/${course.id}`} key={course.id} style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', background: '#fff', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9', transition: 'transform 0.3s' }} className="course-card-modern">
+              <div style={{ height: '200px', width: '100%', position: 'relative' }}>
+                <CourseImage src={course.image} alt={course.title} />
+                <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '8px' }}>
+                  <span style={{ background: '#10b981', color: '#fff', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Free</span>
+                  <span style={{ background: 'rgba(255,255,255,0.9)', color: '#0f172a', padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>All Levels</span>
+                </div>
+              </div>
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3 style={{ fontSize: '1.15rem', marginBottom: '8px', color: '#0f172a', lineHeight: 1.4, fontWeight: 700 }}>{course.title}</h3>
+                <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '16px' }}>by <strong>{course.author || 'Pamoja Educator'}</strong></p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '24px' }}>
+                  {[1,2,3,4,5].map(star => <span key={star} style={{ color: '#fbbf24', fontSize: '1.2rem' }}>★</span>)}
+                  <span style={{ color: '#64748b', fontSize: '0.85rem', marginLeft: '4px' }}>(12)</span>
+                </div>
+                <div style={{ marginTop: 'auto', borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>Free</span>
+                  <span style={{ color: '#64748b', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14}/> {course.duration}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <button className="btn btn-secondary" style={{ background: '#f8fafc', padding: '12px 32px' }}>Explore All Courses</button>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section style={{ background: '#f8fafc', padding: '60px 20px', borderTop: '1px solid #f1f5f9' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: '40px' }}>
+          <div>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '8px', color: '#0f172a' }}>Achieve Your Goals<br/>with Pamoja</h3>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <Award size={32} color="var(--primary)" style={{ margin: '0 auto 8px' }}/>
+            <h4 style={{ fontSize: '1.5rem', color: '#0f172a' }}>1,500+</h4>
+            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Students Enrolled</p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <Target size={32} color="var(--primary)" style={{ margin: '0 auto 8px' }}/>
+            <h4 style={{ fontSize: '1.5rem', color: '#0f172a' }}>12,000</h4>
+            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Classes Completed</p>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <Shield size={32} color="var(--primary)" style={{ margin: '0 auto 8px' }}/>
+            <h4 style={{ fontSize: '1.5rem', color: '#0f172a' }}>100%</h4>
+            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Satisfaction Rate</p>
+          </div>
+        </div>
+      </section>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .course-card-modern:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+        }
+      `}} />
+    </div>
+  );
+}
+
+function Dashboard({ user, profile, courses }) {
+  if (!courses || courses.length === 0) return null;
+
+  return (
+    <div className="animate-fade-in">
+      <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>Welcome back, {profile?.name ? profile.name : 'Doctor'}</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>You have earned {profile?.cpdPoints || 0} CPD points this year. Keep it up!</p>
+        </div>
+        <div className="badge badge-success" style={{ fontSize: '1rem', padding: '8px 16px' }}>
+          <Award size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
+          Verified Practitioner
+        </div>
+      </header>
+
+      <section style={{ marginBottom: '60px' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>Continue Learning</h2>
+        <div className="glass-card" style={{ display: 'flex', gap: '32px', alignItems: 'center', padding: '24px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--primary)' }} />
+          <div style={{ width: '120px', height: '80px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
+            <CourseImage src={courses[0].image} alt="Course cover" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className="badge badge-primary" style={{ marginBottom: '8px' }}>In Progress - 65%</div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>{courses[0].title}</h3>
+            <div style={{ width: '100%', height: '6px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ width: '65%', height: '100%', background: 'var(--primary)' }} />
+            </div>
+          </div>
+          <div>
+            <Link href={`/courses/${courses[0].id}`} className="btn btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <PlayCircle size={20} /> Resume
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '1.5rem' }}>Recommended Modules</h2>
+          <a href="#" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            View All <ArrowRight size={16} />
+          </a>
+        </div>
+        
+        <div className="grid-3">
+          {courses.map((course, idx) => (
+            <Link href={`/courses/${course.id}`} key={course.id} className={`glass-card delay-${idx + 1} animate-fade-in course-card`} style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ height: '180px', width: '100%', position: 'relative' }}>
+                <CourseImage src={course.image} alt={course.title} />
+                <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
+                  <span className="badge badge-warning" style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(4px)' }}>
+                    {course.category}
+                  </span>
+                </div>
+              </div>
+              <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '1.25rem', marginBottom: '12px', lineHeight: 1.3 }}>{course.title}</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px', flex: 1 }}>{course.description}</p>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', gap: '16px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> {course.duration}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Award size={14} /> {course.cpd}</span>
+                  </div>
+                  <span className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>View</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+      <style dangerouslySetInnerHTML={{__html: `
+        .course-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .course-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 30px rgba(0, 180, 216, 0.1);
+        }
+      `}} />
+    </div>
+  );
+}
+</file>
+
+<file path="components/AIAssistant.js">
+"use client";
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from './AuthProvider';
+import { Bot, X, Sparkles, Target, Zap, ChevronRight, Award, User } from 'lucide-react';
+import Link from 'next/link';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+
+export default function AIAssistant() {
+  const { user, profile } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [input, setInput] = useState('');
+  const [challengeAccepted, setChallengeAccepted] = useState(false);
+  const [messages, setMessages] = useState([
+    { type: 'bot', text: 'Hi there! Based on your recent progress, I\'ve curated a personalized learning path for you.' }
+  ]);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => setShowTooltip(true), 3000);
+    } else {
+      setIsOpen(false);
+      setShowTooltip(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (isOpen) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isOpen, challengeAccepted]);
+
+  if (!user) return null;
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    const userMsg = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { type: 'user', text: userMsg }]);
+    
+    // Mock AI response logic
+    setTimeout(() => {
+      let botResponse = "That's an interesting question! For now, focus on your pending labs.";
+      if (userMsg.toLowerCase().includes('points') || userMsg.toLowerCase().includes('cpd')) {
+        botResponse = "You can earn CPD points by completing the verified modules in your dashboard or attending practical labs.";
+      } else if (userMsg.toLowerCase().includes('hello') || userMsg.toLowerCase().includes('hi')) {
+        botResponse = "Hello! Ready to continue your medical training today?";
+      } else if (userMsg.toLowerCase().includes('course')) {
+        botResponse = "I highly recommend the Advanced PPH Intervention Masterclass based on your profile.";
+      }
+      setMessages(prev => [...prev, { type: 'bot', text: botResponse }]);
+    }, 1000);
+  };
+
+  const handleAcceptChallenge = async () => {
+    setChallengeAccepted(true);
+    
+    // Add XP and Notification to user profile in Firebase
+    if (user && profile) {
+      const newPoints = (profile.cpdPoints || 0) + 0.5;
+      const newNotif = { id: Date.now().toString(), text: "Earned +0.5 CPD Points from AI Challenge", time: "Just now", read: false };
+      const currentNotifs = profile.notifications || [];
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, { cpdPoints: newPoints, notifications: [...currentNotifs, newNotif] }, { merge: true });
+    }
+
+    setMessages(prev => [...prev, { type: 'bot', text: 'Awesome! I have awarded you +0.5 Bonus Points for accepting the challenge! Keep up the great work.' }]);
+  };
+
+  return (
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px' }}>
+      
+      {showTooltip && !isOpen && (
+        <div className="glass-card animate-fade-in" style={{ padding: '16px', border: '1px solid var(--primary)', background: 'rgba(3, 4, 94, 0.95)', color: '#fff', borderRadius: '12px 12px 0 12px', position: 'relative' }}>
+          <button onClick={() => setShowTooltip(false)} style={{ position: 'absolute', top: '8px', right: '8px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: 0.7 }}>
+            <X size={14} />
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: 600 }}>
+            <Sparkles size={16} color="var(--primary)" />
+            <span>AI Mentor Tip!</span>
+          </div>
+          <p style={{ fontSize: '0.9rem', maxWidth: '200px', lineHeight: 1.4, color: 'rgba(255,255,255,0.8)' }}>
+            Complete the <b>Neonatology</b> module today to earn a <b>+50 XP Bonus</b>!
+          </p>
+        </div>
+      )}
+
+      {isOpen && (
+        <div className="glass-card animate-fade-in" style={{ width: '380px', height: '600px', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+          <div style={{ background: 'var(--primary)', color: '#fff', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bot size={20} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Pamoja AI Mentor</h3>
+                <p style={{ fontSize: '0.75rem', opacity: 0.8, margin: 0 }}>Always here to guide you</p>
+              </div>
+            </div>
+            <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
+              <X size={24} />
+            </button>
+          </div>
+
+          <div style={{ flex: 1, padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', background: 'var(--background)' }}>
+            
+            {/* Initial Dynamic Content Widget */}
+            <div style={{ alignSelf: 'center', background: 'rgba(0,180,216,0.05)', padding: '16px', borderRadius: 'var(--radius-md)', width: '100%', border: '1px solid rgba(0,180,216,0.2)' }}>
+              <h4 style={{ fontSize: '0.9rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--primary)' }}>
+                <Target size={16} /> Recommended Next Steps
+              </h4>
+              <Link href="/courses/1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface)', padding: '12px', borderRadius: 'var(--radius-sm)', marginBottom: '8px', textDecoration: 'none', color: 'inherit', border: '1px solid var(--border)' }}>
+                <div><p style={{ fontSize: '0.85rem', fontWeight: 600 }}>1. Complete Module 3</p><p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Advanced PPH Intervention</p></div>
+                <ChevronRight size={16} color="var(--text-muted)" />
+              </Link>
+              <Link href="/labs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface)', padding: '12px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', color: 'inherit', border: '1px solid var(--border)' }}>
+                <div><p style={{ fontSize: '0.85rem', fontWeight: 600 }}>2. Book Practical Lab</p><p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Required for certification</p></div>
+                <ChevronRight size={16} color="var(--text-muted)" />
+              </Link>
+            </div>
+
+            {!challengeAccepted && (
+              <div className="animate-fade-in" style={{ alignSelf: 'center', background: 'rgba(255, 183, 3, 0.1)', padding: '16px', borderRadius: 'var(--radius-md)', width: '100%', border: '1px solid rgba(255, 183, 3, 0.3)' }}>
+                <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: '#fb8500' }}>
+                  <Zap size={16} /> Daily Challenge
+                </h4>
+                <p style={{ fontSize: '0.85rem', marginBottom: '12px', color: 'var(--text-main)' }}>Pass the Neonatology knowledge check quiz today to earn +0.5 Bonus Points.</p>
+                <button onClick={handleAcceptChallenge} className="btn" style={{ background: '#ffb703', color: '#000', width: '100%', justifyContent: 'center', padding: '8px', fontSize: '0.85rem', border: 'none', cursor: 'pointer' }}>
+                  <Award size={16} style={{marginRight: '6px'}}/> Accept Challenge
+                </button>
+              </div>
+            )}
+
+            {/* Chat Messages */}
+            {messages.map((msg, i) => (
+              <div key={i} style={{ display: 'flex', gap: '8px', alignSelf: msg.type === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
+                {msg.type === 'bot' && (
+                  <div style={{ width: '28px', height: '28px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0, marginTop: '4px' }}>
+                    <Bot size={14} />
+                  </div>
+                )}
+                <div style={{ 
+                  background: msg.type === 'user' ? 'var(--primary)' : 'var(--surface)', 
+                  color: msg.type === 'user' ? '#fff' : 'var(--text-main)',
+                  padding: '12px 16px', 
+                  borderRadius: msg.type === 'user' ? '16px 16px 0 16px' : '16px 16px 16px 0', 
+                  border: msg.type === 'user' ? 'none' : '1px solid var(--border)',
+                  fontSize: '0.9rem',
+                  lineHeight: 1.5
+                }}>
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+            
+            <div ref={chatEndRef} />
+          </div>
+
+          <div style={{ padding: '16px', borderTop: '1px solid var(--border)', background: 'var(--surface)' }}>
+            <div className="input-group" style={{ marginBottom: 0, position: 'relative' }}>
+              <input 
+                type="text" 
+                placeholder="Ask me anything..." 
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                style={{ paddingRight: '40px', background: 'var(--background)' }} 
+              />
+              <button onClick={handleSend} style={{ position: 'absolute', right: '8px', top: '8px', background: 'var(--primary)', border: 'none', width: '24px', height: '24px', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button 
+        onClick={() => { setIsOpen(!isOpen); setShowTooltip(false); }} 
+        style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(0, 180, 216, 0.4)', transition: 'transform 0.2s' }}
+        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        {isOpen ? <X size={28} /> : <Bot size={28} />}
+      </button>
+    </div>
+  );
+}
+</file>
+
+<file path="components/AuthProvider.js">
+"use client";
+
+import { createContext, useContext, useEffect, useState } from 'react';
+import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db, googleProvider } from '../lib/firebase';
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      
+      if (currentUser) {
+        // Fetch or create user profile in Firestore
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          let data = userSnap.data();
+          // Ensure superadmin email always gets superuser role
+          if (currentUser.email === process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL && data.role !== 'superuser') {
+            data.role = 'superuser';
+            await setDoc(userRef, { role: 'superuser' }, { merge: true });
+          }
+          setProfile(data);
+        } else {
+          // Initialize new user profile
+          const newProfile = {
+            name: currentUser.displayName,
+            email: currentUser.email,
+            photoURL: currentUser.photoURL,
+            role: currentUser.email === process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL ? 'superuser' : 'learner',
+            cpdPoints: 0,
+            badges: [],
+            certificates: [],
+            createdAt: new Date().toISOString()
+          };
+          await setDoc(userRef, newProfile);
+          setProfile(newProfile);
+        }
+      } else {
+        setProfile(null);
+      }
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const loginWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Login failed", error);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, profile, loading, loginWithGoogle, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
+</file>
+
+<file path="components/Footer.js">
+"use client";
+import Link from 'next/link';
+import { Heart, Activity, Globe, BookOpen } from 'lucide-react';
+
+export default function Footer() {
+  return (
+    <footer style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', padding: '60px 24px 24px', marginTop: 'auto' }}>
+      <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', marginBottom: '40px' }}>
+        
+        <div>
+          <h3 style={{ fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Activity color="var(--primary)" /> Pamoja
+          </h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+            Empowering medical professionals with offline-first training, simulation labs, and accredited CPD points.
+          </p>
+        </div>
+
+        <div>
+          <h4 style={{ fontSize: '1rem', marginBottom: '16px', color: 'var(--text-main)' }}>Platform</h4>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <li><Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Courses</Link></li>
+            <li><Link href="/labs" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Simulation Labs</Link></li>
+            <li><Link href="/practitioners" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Public Directory</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style={{ fontSize: '1rem', marginBottom: '16px', color: 'var(--text-main)' }}>For Educators</h4>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <li><Link href="/studio" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Educator Studio</Link></li>
+            <li><a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Apply to Teach</a></li>
+            <li><a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Content Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style={{ fontSize: '1rem', marginBottom: '16px', color: 'var(--text-main)' }}>Support</h4>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <li><a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Help Center</a></li>
+            <li><a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Contact Us</a></li>
+            <li><a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Privacy Policy</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div className="container" style={{ borderTop: '1px solid var(--border)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+        <p>&copy; {new Date().getFullYear()} Pamoja Medical Training. All rights reserved.</p>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <Globe size={16} />
+          <Heart size={16} />
+          <BookOpen size={16} />
+        </div>
+      </div>
+    </footer>
+  );
+}
+</file>
+
+<file path="components/Navbar.js">
+"use client";
+import Link from 'next/link';
+import { Stethoscope, Calendar, User, BookOpen, LogOut, Award, Presentation, Bell } from 'lucide-react';
+import { useAuth } from './AuthProvider';
+import { useState, useEffect, useRef } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+
+export default function Navbar() {
+  const { user, profile, loginWithGoogle, logout } = useAuth();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifRef = useRef();
+
+  // Load from profile and calculate unread
+  const notifications = profile?.notifications || [];
+
+  useEffect(() => {
+    if (profile?.notifications) {
+      const unread = profile.notifications.filter(n => !n.read).length;
+      setUnreadCount(unread);
+    }
+  }, [profile?.notifications]);
+
+  // Click outside to close
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggleNotifications = async () => {
+    const opening = !showNotifications;
+    setShowNotifications(opening);
+    
+    // If opening and there are unread, mark them all as read in Firebase
+    if (opening && unreadCount > 0 && user) {
+      setUnreadCount(0); // Optimistic UI update
+      const updatedNotifs = notifications.map(n => ({ ...n, read: true }));
+      await setDoc(doc(db, 'users', user.uid), { notifications: updatedNotifs }, { merge: true });
+    }
+  };
+
+  return (
+    <nav className="navbar">
+      <div className="container navbar-content">
+        <Link href="/" className="brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Stethoscope size={28} />
+          Pamoja
+        </Link>
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <Link href="/" className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+            <BookOpen size={18} /> Courses
+          </Link>
+          <Link href="/labs" className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+            <Calendar size={18} /> Labs
+          </Link>
+          
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '1px solid var(--border)', paddingLeft: '16px' }}>
+              
+              {(profile?.role === 'creator' || profile?.role === 'superuser') && (
+                <Link href="/studio" className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, marginRight: '8px', color: 'var(--text-main)' }}>
+                  <Presentation size={18} /> Studio
+                </Link>
+              )}
+
+              <div style={{ position: 'relative' }} ref={notifRef}>
+                <button onClick={handleToggleNotifications} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', position: 'relative' }}>
+                  <Bell size={20} />
+                  {unreadCount > 0 && (
+                    <span style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--danger)', color: '#fff', fontSize: '0.65rem', width: '14px', height: '14px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <div className="glass-card animate-fade-in" style={{ position: 'absolute', top: '40px', right: '-10px', width: '300px', padding: '16px', zIndex: 50, display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
+                    <h4 style={{ fontSize: '0.9rem', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>Notifications</h4>
+                    {notifications.length === 0 ? (
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '12px 0' }}>No notifications yet.</p>
+                    ) : (
+                      notifications.slice().reverse().map(n => (
+                        <div key={n.id} style={{ fontSize: '0.85rem', opacity: n.read ? 0.7 : 1 }}>
+                          <p style={{ fontWeight: n.read ? 400 : 600, color: 'var(--text-main)' }}>{n.text}</p>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{n.time}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-main)', fontWeight: 600 }}>
+                {profile?.photoURL && !imageError ? (
+                  <img src={profile.photoURL} alt="Profile" onError={() => setImageError(true)} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ padding: '8px', background: 'var(--surface-hover)', borderRadius: '50%', color: 'var(--text-muted)' }}><User size={16} /></div>
+                )}
+                <span>{profile?.cpdPoints || 0} pts <Award size={14} style={{ display: 'inline', color: 'var(--accent)' }}/></span>
+              </Link>
+              <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <button onClick={loginWithGoogle} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
+              Sign In
+            </button>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+</file>
+
+<file path="lib/firebase.js">
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "dummy-api-key",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "dummy.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "dummy-project",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "dummy.appspot.com",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "00000000",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:000:web:000"
+};
+
+// Initialize Firebase
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+export { app, auth, db, googleProvider };
+</file>
+
+<file path="public/file.svg">
+<svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
+</file>
+
+<file path="public/globe.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+</file>
+
+<file path="public/manifest.json">
+{
+  "name": "Pamoja Platform",
+  "short_name": "Pamoja",
+  "description": "Offline-first medical training and simulation lab scheduling platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00b4d8",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+</file>
+
+<file path="public/next.svg">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 394 80"><path fill="#000" d="M262 0h68.5v12.7h-27.2v66.6h-13.6V12.7H262V0ZM149 0v12.7H94v20.4h44.3v12.6H94v21h55v12.6H80.5V0h68.7zm34.3 0h-17.8l63.8 79.4h17.9l-32-39.7 32-39.6h-17.9l-23 28.6-23-28.6zm18.3 56.7-9-11-27.1 33.7h17.8l18.3-22.7z"/><path fill="#000" d="M81 79.3 17 0H0v79.3h13.6V17l50.2 62.3H81Zm252.6-.4c-1 0-1.8-.4-2.5-1s-1.1-1.6-1.1-2.6.3-1.8 1-2.5 1.6-1 2.6-1 1.8.3 2.5 1a3.4 3.4 0 0 1 .6 4.3 3.7 3.7 0 0 1-3 1.8zm23.2-33.5h6v23.3c0 2.1-.4 4-1.3 5.5a9.1 9.1 0 0 1-3.8 3.5c-1.6.8-3.5 1.3-5.7 1.3-2 0-3.7-.4-5.3-1s-2.8-1.8-3.7-3.2c-.9-1.3-1.4-3-1.4-5h6c.1.8.3 1.6.7 2.2s1 1.2 1.6 1.5c.7.4 1.5.5 2.4.5 1 0 1.8-.2 2.4-.6a4 4 0 0 0 1.6-1.8c.3-.8.5-1.8.5-3V45.5zm30.9 9.1a4.4 4.4 0 0 0-2-3.3 7.5 7.5 0 0 0-4.3-1.1c-1.3 0-2.4.2-3.3.5-.9.4-1.6 1-2 1.6a3.5 3.5 0 0 0-.3 4c.3.5.7.9 1.3 1.2l1.8 1 2 .5 3.2.8c1.3.3 2.5.7 3.7 1.2a13 13 0 0 1 3.2 1.8 8.1 8.1 0 0 1 3 6.5c0 2-.5 3.7-1.5 5.1a10 10 0 0 1-4.4 3.5c-1.8.8-4.1 1.2-6.8 1.2-2.6 0-4.9-.4-6.8-1.2-2-.8-3.4-2-4.5-3.5a10 10 0 0 1-1.7-5.6h6a5 5 0 0 0 3.5 4.6c1 .4 2.2.6 3.4.6 1.3 0 2.5-.2 3.5-.6 1-.4 1.8-1 2.4-1.7a4 4 0 0 0 .8-2.4c0-.9-.2-1.6-.7-2.2a11 11 0 0 0-2.1-1.4l-3.2-1-3.8-1c-2.8-.7-5-1.7-6.6-3.2a7.2 7.2 0 0 1-2.4-5.7 8 8 0 0 1 1.7-5 10 10 0 0 1 4.3-3.5c2-.8 4-1.2 6.4-1.2 2.3 0 4.4.4 6.2 1.2 1.8.8 3.2 2 4.3 3.4 1 1.4 1.5 3 1.5 5h-5.8z"/></svg>
+</file>
+
+<file path="public/sw.js">
+if(!self.define){let e,s={};const n=(n,a)=>(n=new URL(n+".js",a).href,s[n]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=s,document.head.appendChild(e)}else e=n,importScripts(n),s()}).then(()=>{let e=s[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e}));self.define=(a,t)=>{const i=e||("document"in self?document.currentScript.src:"")||location.href;if(s[i])return;let c={};const r=e=>n(e,i),o={module:{uri:i},exports:c,require:r};s[i]=Promise.all(a.map(e=>o[e]||r(e))).then(e=>(t(...e),c))}}define(["./workbox-4754cb34"],function(e){"use strict";importScripts(),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/_next/static/chunks/1770a7a7-ecbd185d7f84c74a.js",revision:"ecbd185d7f84c74a"},{url:"/_next/static/chunks/4bd1b696-215e5051988c3dde.js",revision:"215e5051988c3dde"},{url:"/_next/static/chunks/777-408983768c771276.js",revision:"408983768c771276"},{url:"/_next/static/chunks/794-8c8774bd9adfd317.js",revision:"8c8774bd9adfd317"},{url:"/_next/static/chunks/829-c68f85d27e51a454.js",revision:"c68f85d27e51a454"},{url:"/_next/static/chunks/899.1813981119fa1f8a.js",revision:"1813981119fa1f8a"},{url:"/_next/static/chunks/966.1775eb621d8d3e09.js",revision:"1775eb621d8d3e09"},{url:"/_next/static/chunks/a36bde72-00e8c3f80454ea38.js",revision:"00e8c3f80454ea38"},{url:"/_next/static/chunks/app/_global-error/page-aba28f88d5781771.js",revision:"aba28f88d5781771"},{url:"/_next/static/chunks/app/_not-found/page-79ef0b0ccd661cf4.js",revision:"79ef0b0ccd661cf4"},{url:"/_next/static/chunks/app/courses/%5Bid%5D/page-24dbab6fa78b0ea8.js",revision:"24dbab6fa78b0ea8"},{url:"/_next/static/chunks/app/labs/page-00f05fce2ed42e63.js",revision:"00f05fce2ed42e63"},{url:"/_next/static/chunks/app/layout-1117aaa5c4aa2194.js",revision:"1117aaa5c4aa2194"},{url:"/_next/static/chunks/app/page-cb0405e775337965.js",revision:"cb0405e775337965"},{url:"/_next/static/chunks/app/practitioners/page-ed162dfcb116e863.js",revision:"ed162dfcb116e863"},{url:"/_next/static/chunks/app/profile/page-512b701ac78c0777.js",revision:"512b701ac78c0777"},{url:"/_next/static/chunks/app/studio/page-10f9b0d674426788.js",revision:"10f9b0d674426788"},{url:"/_next/static/chunks/cc44e60b-820e77fe3a593fd3.js",revision:"820e77fe3a593fd3"},{url:"/_next/static/chunks/framework-93cda6578f6c76ec.js",revision:"93cda6578f6c76ec"},{url:"/_next/static/chunks/main-585cbc1d0a989dfd.js",revision:"585cbc1d0a989dfd"},{url:"/_next/static/chunks/main-app-7e780cbae3476bb9.js",revision:"7e780cbae3476bb9"},{url:"/_next/static/chunks/next/dist/client/components/builtin/app-error-aba28f88d5781771.js",revision:"aba28f88d5781771"},{url:"/_next/static/chunks/next/dist/client/components/builtin/forbidden-aba28f88d5781771.js",revision:"aba28f88d5781771"},{url:"/_next/static/chunks/next/dist/client/components/builtin/global-error-01374ed1ce9e53e9.js",revision:"01374ed1ce9e53e9"},{url:"/_next/static/chunks/next/dist/client/components/builtin/not-found-aba28f88d5781771.js",revision:"aba28f88d5781771"},{url:"/_next/static/chunks/next/dist/client/components/builtin/unauthorized-aba28f88d5781771.js",revision:"aba28f88d5781771"},{url:"/_next/static/chunks/polyfills-42372ed130431b0a.js",revision:"846118c33b2c0e922d7b3a7676f81f6f"},{url:"/_next/static/chunks/webpack-6c052340e4eb52a9.js",revision:"6c052340e4eb52a9"},{url:"/_next/static/css/6f309bbf93cbc6bf.css",revision:"6f309bbf93cbc6bf"},{url:"/_next/static/yqni2q-g7NTHBd4ChB3k0/_buildManifest.js",revision:"c0c0c1b8db6c021cabe713addb035f61"},{url:"/_next/static/yqni2q-g7NTHBd4ChB3k0/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/file.svg",revision:"d09f95206c3fa0bb9bd9fefabfd0ea71"},{url:"/globe.svg",revision:"2aaafa6a49b6563925fe440891e32717"},{url:"/manifest.json",revision:"d08ac7875a8f5177dc4399c0108ca3af"},{url:"/next.svg",revision:"8e061864f388b47f33a1c3780831193e"},{url:"/vercel.svg",revision:"c0af2f507b369b085b35ef4bbe3bcf1e"},{url:"/window.svg",revision:"a2760511c65806022ad20adf74370ff3"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:n,state:a})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>{if(!(self.origin===e.origin))return!1;const s=e.pathname;return!s.startsWith("/api/auth/")&&!!s.startsWith("/api/")},new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>{if(!(self.origin===e.origin))return!1;return!e.pathname.startsWith("/api/")},new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>!(self.origin===e.origin),new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600})]}),"GET")});
+</file>
+
+<file path="public/vercel.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1155 1000"><path d="m577.3 0 577.4 1000H0z" fill="#fff"/></svg>
+</file>
+
+<file path="public/window.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.5h13v10a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1zM0 1h16v11.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 0 12.5zm3.75 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M7 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5" fill="#666"/></svg>
+</file>
+
+<file path="public/workbox-4754cb34.js">
+define(["exports"],function(t){"use strict";try{self["workbox:core:6.5.4"]&&_()}catch(t){}const e=(t,...e)=>{let s=t;return e.length>0&&(s+=` :: ${JSON.stringify(e)}`),s};class s extends Error{constructor(t,s){super(e(t,s)),this.name=t,this.details=s}}try{self["workbox:routing:6.5.4"]&&_()}catch(t){}const n=t=>t&&"object"==typeof t?t:{handle:t};class r{constructor(t,e,s="GET"){this.handler=n(e),this.match=t,this.method=s}setCatchHandler(t){this.catchHandler=n(t)}}class i extends r{constructor(t,e,s){super(({url:e})=>{const s=t.exec(e.href);if(s&&(e.origin===location.origin||0===s.index))return s.slice(1)},e,s)}}class a{constructor(){this.t=new Map,this.i=new Map}get routes(){return this.t}addFetchListener(){self.addEventListener("fetch",t=>{const{request:e}=t,s=this.handleRequest({request:e,event:t});s&&t.respondWith(s)})}addCacheListener(){self.addEventListener("message",t=>{if(t.data&&"CACHE_URLS"===t.data.type){const{payload:e}=t.data,s=Promise.all(e.urlsToCache.map(e=>{"string"==typeof e&&(e=[e]);const s=new Request(...e);return this.handleRequest({request:s,event:t})}));t.waitUntil(s),t.ports&&t.ports[0]&&s.then(()=>t.ports[0].postMessage(!0))}})}handleRequest({request:t,event:e}){const s=new URL(t.url,location.href);if(!s.protocol.startsWith("http"))return;const n=s.origin===location.origin,{params:r,route:i}=this.findMatchingRoute({event:e,request:t,sameOrigin:n,url:s});let a=i&&i.handler;const o=t.method;if(!a&&this.i.has(o)&&(a=this.i.get(o)),!a)return;let c;try{c=a.handle({url:s,request:t,event:e,params:r})}catch(t){c=Promise.reject(t)}const h=i&&i.catchHandler;return c instanceof Promise&&(this.o||h)&&(c=c.catch(async n=>{if(h)try{return await h.handle({url:s,request:t,event:e,params:r})}catch(t){t instanceof Error&&(n=t)}if(this.o)return this.o.handle({url:s,request:t,event:e});throw n})),c}findMatchingRoute({url:t,sameOrigin:e,request:s,event:n}){const r=this.t.get(s.method)||[];for(const i of r){let r;const a=i.match({url:t,sameOrigin:e,request:s,event:n});if(a)return r=a,(Array.isArray(r)&&0===r.length||a.constructor===Object&&0===Object.keys(a).length||"boolean"==typeof a)&&(r=void 0),{route:i,params:r}}return{}}setDefaultHandler(t,e="GET"){this.i.set(e,n(t))}setCatchHandler(t){this.o=n(t)}registerRoute(t){this.t.has(t.method)||this.t.set(t.method,[]),this.t.get(t.method).push(t)}unregisterRoute(t){if(!this.t.has(t.method))throw new s("unregister-route-but-not-found-with-method",{method:t.method});const e=this.t.get(t.method).indexOf(t);if(!(e>-1))throw new s("unregister-route-route-not-registered");this.t.get(t.method).splice(e,1)}}let o;const c=()=>(o||(o=new a,o.addFetchListener(),o.addCacheListener()),o);function h(t,e,n){let a;if("string"==typeof t){const s=new URL(t,location.href);a=new r(({url:t})=>t.href===s.href,e,n)}else if(t instanceof RegExp)a=new i(t,e,n);else if("function"==typeof t)a=new r(t,e,n);else{if(!(t instanceof r))throw new s("unsupported-route-type",{moduleName:"workbox-routing",funcName:"registerRoute",paramName:"capture"});a=t}return c().registerRoute(a),a}try{self["workbox:strategies:6.5.4"]&&_()}catch(t){}const u={cacheWillUpdate:async({response:t})=>200===t.status||0===t.status?t:null},l={googleAnalytics:"googleAnalytics",precache:"precache-v2",prefix:"workbox",runtime:"runtime",suffix:"undefined"!=typeof registration?registration.scope:""},f=t=>[l.prefix,t,l.suffix].filter(t=>t&&t.length>0).join("-"),w=t=>t||f(l.precache),d=t=>t||f(l.runtime);function p(t,e){const s=new URL(t);for(const t of e)s.searchParams.delete(t);return s.href}class y{constructor(){this.promise=new Promise((t,e)=>{this.resolve=t,this.reject=e})}}const g=new Set;function m(t){return"string"==typeof t?new Request(t):t}class v{constructor(t,e){this.h={},Object.assign(this,e),this.event=e.event,this.u=t,this.l=new y,this.p=[],this.m=[...t.plugins],this.v=new Map;for(const t of this.m)this.v.set(t,{});this.event.waitUntil(this.l.promise)}async fetch(t){const{event:e}=this;let n=m(t);if("navigate"===n.mode&&e instanceof FetchEvent&&e.preloadResponse){const t=await e.preloadResponse;if(t)return t}const r=this.hasCallback("fetchDidFail")?n.clone():null;try{for(const t of this.iterateCallbacks("requestWillFetch"))n=await t({request:n.clone(),event:e})}catch(t){if(t instanceof Error)throw new s("plugin-error-request-will-fetch",{thrownErrorMessage:t.message})}const i=n.clone();try{let t;t=await fetch(n,"navigate"===n.mode?void 0:this.u.fetchOptions);for(const s of this.iterateCallbacks("fetchDidSucceed"))t=await s({event:e,request:i,response:t});return t}catch(t){throw r&&await this.runCallbacks("fetchDidFail",{error:t,event:e,originalRequest:r.clone(),request:i.clone()}),t}}async fetchAndCachePut(t){const e=await this.fetch(t),s=e.clone();return this.waitUntil(this.cachePut(t,s)),e}async cacheMatch(t){const e=m(t);let s;const{cacheName:n,matchOptions:r}=this.u,i=await this.getCacheKey(e,"read"),a=Object.assign(Object.assign({},r),{cacheName:n});s=await caches.match(i,a);for(const t of this.iterateCallbacks("cachedResponseWillBeUsed"))s=await t({cacheName:n,matchOptions:r,cachedResponse:s,request:i,event:this.event})||void 0;return s}async cachePut(t,e){const n=m(t);var r;await(r=0,new Promise(t=>setTimeout(t,r)));const i=await this.getCacheKey(n,"write");if(!e)throw new s("cache-put-with-no-response",{url:(a=i.url,new URL(String(a),location.href).href.replace(new RegExp(`^${location.origin}`),""))});var a;const o=await this.R(e);if(!o)return!1;const{cacheName:c,matchOptions:h}=this.u,u=await self.caches.open(c),l=this.hasCallback("cacheDidUpdate"),f=l?await async function(t,e,s,n){const r=p(e.url,s);if(e.url===r)return t.match(e,n);const i=Object.assign(Object.assign({},n),{ignoreSearch:!0}),a=await t.keys(e,i);for(const e of a)if(r===p(e.url,s))return t.match(e,n)}(u,i.clone(),["__WB_REVISION__"],h):null;try{await u.put(i,l?o.clone():o)}catch(t){if(t instanceof Error)throw"QuotaExceededError"===t.name&&await async function(){for(const t of g)await t()}(),t}for(const t of this.iterateCallbacks("cacheDidUpdate"))await t({cacheName:c,oldResponse:f,newResponse:o.clone(),request:i,event:this.event});return!0}async getCacheKey(t,e){const s=`${t.url} | ${e}`;if(!this.h[s]){let n=t;for(const t of this.iterateCallbacks("cacheKeyWillBeUsed"))n=m(await t({mode:e,request:n,event:this.event,params:this.params}));this.h[s]=n}return this.h[s]}hasCallback(t){for(const e of this.u.plugins)if(t in e)return!0;return!1}async runCallbacks(t,e){for(const s of this.iterateCallbacks(t))await s(e)}*iterateCallbacks(t){for(const e of this.u.plugins)if("function"==typeof e[t]){const s=this.v.get(e),n=n=>{const r=Object.assign(Object.assign({},n),{state:s});return e[t](r)};yield n}}waitUntil(t){return this.p.push(t),t}async doneWaiting(){let t;for(;t=this.p.shift();)await t}destroy(){this.l.resolve(null)}async R(t){let e=t,s=!1;for(const t of this.iterateCallbacks("cacheWillUpdate"))if(e=await t({request:this.request,response:e,event:this.event})||void 0,s=!0,!e)break;return s||e&&200!==e.status&&(e=void 0),e}}class R{constructor(t={}){this.cacheName=d(t.cacheName),this.plugins=t.plugins||[],this.fetchOptions=t.fetchOptions,this.matchOptions=t.matchOptions}handle(t){const[e]=this.handleAll(t);return e}handleAll(t){t instanceof FetchEvent&&(t={event:t,request:t.request});const e=t.event,s="string"==typeof t.request?new Request(t.request):t.request,n="params"in t?t.params:void 0,r=new v(this,{event:e,request:s,params:n}),i=this.q(r,s,e);return[i,this.D(i,r,s,e)]}async q(t,e,n){let r;await t.runCallbacks("handlerWillStart",{event:n,request:e});try{if(r=await this.U(e,t),!r||"error"===r.type)throw new s("no-response",{url:e.url})}catch(s){if(s instanceof Error)for(const i of t.iterateCallbacks("handlerDidError"))if(r=await i({error:s,event:n,request:e}),r)break;if(!r)throw s}for(const s of t.iterateCallbacks("handlerWillRespond"))r=await s({event:n,request:e,response:r});return r}async D(t,e,s,n){let r,i;try{r=await t}catch(i){}try{await e.runCallbacks("handlerDidRespond",{event:n,request:s,response:r}),await e.doneWaiting()}catch(t){t instanceof Error&&(i=t)}if(await e.runCallbacks("handlerDidComplete",{event:n,request:s,response:r,error:i}),e.destroy(),i)throw i}}function b(t){t.then(()=>{})}function q(){return q=Object.assign?Object.assign.bind():function(t){for(var e=1;e<arguments.length;e++){var s=arguments[e];for(var n in s)({}).hasOwnProperty.call(s,n)&&(t[n]=s[n])}return t},q.apply(null,arguments)}let D,U;const x=new WeakMap,L=new WeakMap,I=new WeakMap,C=new WeakMap,E=new WeakMap;let N={get(t,e,s){if(t instanceof IDBTransaction){if("done"===e)return L.get(t);if("objectStoreNames"===e)return t.objectStoreNames||I.get(t);if("store"===e)return s.objectStoreNames[1]?void 0:s.objectStore(s.objectStoreNames[0])}return k(t[e])},set:(t,e,s)=>(t[e]=s,!0),has:(t,e)=>t instanceof IDBTransaction&&("done"===e||"store"===e)||e in t};function O(t){return t!==IDBDatabase.prototype.transaction||"objectStoreNames"in IDBTransaction.prototype?(U||(U=[IDBCursor.prototype.advance,IDBCursor.prototype.continue,IDBCursor.prototype.continuePrimaryKey])).includes(t)?function(...e){return t.apply(B(this),e),k(x.get(this))}:function(...e){return k(t.apply(B(this),e))}:function(e,...s){const n=t.call(B(this),e,...s);return I.set(n,e.sort?e.sort():[e]),k(n)}}function T(t){return"function"==typeof t?O(t):(t instanceof IDBTransaction&&function(t){if(L.has(t))return;const e=new Promise((e,s)=>{const n=()=>{t.removeEventListener("complete",r),t.removeEventListener("error",i),t.removeEventListener("abort",i)},r=()=>{e(),n()},i=()=>{s(t.error||new DOMException("AbortError","AbortError")),n()};t.addEventListener("complete",r),t.addEventListener("error",i),t.addEventListener("abort",i)});L.set(t,e)}(t),e=t,(D||(D=[IDBDatabase,IDBObjectStore,IDBIndex,IDBCursor,IDBTransaction])).some(t=>e instanceof t)?new Proxy(t,N):t);var e}function k(t){if(t instanceof IDBRequest)return function(t){const e=new Promise((e,s)=>{const n=()=>{t.removeEventListener("success",r),t.removeEventListener("error",i)},r=()=>{e(k(t.result)),n()},i=()=>{s(t.error),n()};t.addEventListener("success",r),t.addEventListener("error",i)});return e.then(e=>{e instanceof IDBCursor&&x.set(e,t)}).catch(()=>{}),E.set(e,t),e}(t);if(C.has(t))return C.get(t);const e=T(t);return e!==t&&(C.set(t,e),E.set(e,t)),e}const B=t=>E.get(t);const P=["get","getKey","getAll","getAllKeys","count"],M=["put","add","delete","clear"],W=new Map;function j(t,e){if(!(t instanceof IDBDatabase)||e in t||"string"!=typeof e)return;if(W.get(e))return W.get(e);const s=e.replace(/FromIndex$/,""),n=e!==s,r=M.includes(s);if(!(s in(n?IDBIndex:IDBObjectStore).prototype)||!r&&!P.includes(s))return;const i=async function(t,...e){const i=this.transaction(t,r?"readwrite":"readonly");let a=i.store;return n&&(a=a.index(e.shift())),(await Promise.all([a[s](...e),r&&i.done]))[0]};return W.set(e,i),i}N=(t=>q({},t,{get:(e,s,n)=>j(e,s)||t.get(e,s,n),has:(e,s)=>!!j(e,s)||t.has(e,s)}))(N);try{self["workbox:expiration:6.5.4"]&&_()}catch(t){}const S="cache-entries",K=t=>{const e=new URL(t,location.href);return e.hash="",e.href};class A{constructor(t){this._=null,this.L=t}I(t){const e=t.createObjectStore(S,{keyPath:"id"});e.createIndex("cacheName","cacheName",{unique:!1}),e.createIndex("timestamp","timestamp",{unique:!1})}C(t){this.I(t),this.L&&function(t,{blocked:e}={}){const s=indexedDB.deleteDatabase(t);e&&s.addEventListener("blocked",t=>e(t.oldVersion,t)),k(s).then(()=>{})}(this.L)}async setTimestamp(t,e){const s={url:t=K(t),timestamp:e,cacheName:this.L,id:this.N(t)},n=(await this.getDb()).transaction(S,"readwrite",{durability:"relaxed"});await n.store.put(s),await n.done}async getTimestamp(t){const e=await this.getDb(),s=await e.get(S,this.N(t));return null==s?void 0:s.timestamp}async expireEntries(t,e){const s=await this.getDb();let n=await s.transaction(S).store.index("timestamp").openCursor(null,"prev");const r=[];let i=0;for(;n;){const s=n.value;s.cacheName===this.L&&(t&&s.timestamp<t||e&&i>=e?r.push(n.value):i++),n=await n.continue()}const a=[];for(const t of r)await s.delete(S,t.id),a.push(t.url);return a}N(t){return this.L+"|"+K(t)}async getDb(){return this._||(this._=await function(t,e,{blocked:s,upgrade:n,blocking:r,terminated:i}={}){const a=indexedDB.open(t,e),o=k(a);return n&&a.addEventListener("upgradeneeded",t=>{n(k(a.result),t.oldVersion,t.newVersion,k(a.transaction),t)}),s&&a.addEventListener("blocked",t=>s(t.oldVersion,t.newVersion,t)),o.then(t=>{i&&t.addEventListener("close",()=>i()),r&&t.addEventListener("versionchange",t=>r(t.oldVersion,t.newVersion,t))}).catch(()=>{}),o}("workbox-expiration",1,{upgrade:this.C.bind(this)})),this._}}class F{constructor(t,e={}){this.O=!1,this.T=!1,this.k=e.maxEntries,this.B=e.maxAgeSeconds,this.P=e.matchOptions,this.L=t,this.M=new A(t)}async expireEntries(){if(this.O)return void(this.T=!0);this.O=!0;const t=this.B?Date.now()-1e3*this.B:0,e=await this.M.expireEntries(t,this.k),s=await self.caches.open(this.L);for(const t of e)await s.delete(t,this.P);this.O=!1,this.T&&(this.T=!1,b(this.expireEntries()))}async updateTimestamp(t){await this.M.setTimestamp(t,Date.now())}async isURLExpired(t){if(this.B){const e=await this.M.getTimestamp(t),s=Date.now()-1e3*this.B;return void 0===e||e<s}return!1}async delete(){this.T=!1,await this.M.expireEntries(1/0)}}try{self["workbox:range-requests:6.5.4"]&&_()}catch(t){}async function H(t,e){try{if(206===e.status)return e;const n=t.headers.get("range");if(!n)throw new s("no-range-header");const r=function(t){const e=t.trim().toLowerCase();if(!e.startsWith("bytes="))throw new s("unit-must-be-bytes",{normalizedRangeHeader:e});if(e.includes(","))throw new s("single-range-only",{normalizedRangeHeader:e});const n=/(\d*)-(\d*)/.exec(e);if(!n||!n[1]&&!n[2])throw new s("invalid-range-values",{normalizedRangeHeader:e});return{start:""===n[1]?void 0:Number(n[1]),end:""===n[2]?void 0:Number(n[2])}}(n),i=await e.blob(),a=function(t,e,n){const r=t.size;if(n&&n>r||e&&e<0)throw new s("range-not-satisfiable",{size:r,end:n,start:e});let i,a;return void 0!==e&&void 0!==n?(i=e,a=n+1):void 0!==e&&void 0===n?(i=e,a=r):void 0!==n&&void 0===e&&(i=r-n,a=r),{start:i,end:a}}(i,r.start,r.end),o=i.slice(a.start,a.end),c=o.size,h=new Response(o,{status:206,statusText:"Partial Content",headers:e.headers});return h.headers.set("Content-Length",String(c)),h.headers.set("Content-Range",`bytes ${a.start}-${a.end-1}/${i.size}`),h}catch(t){return new Response("",{status:416,statusText:"Range Not Satisfiable"})}}function $(t,e){const s=e();return t.waitUntil(s),s}try{self["workbox:precaching:6.5.4"]&&_()}catch(t){}function z(t){if(!t)throw new s("add-to-cache-list-unexpected-type",{entry:t});if("string"==typeof t){const e=new URL(t,location.href);return{cacheKey:e.href,url:e.href}}const{revision:e,url:n}=t;if(!n)throw new s("add-to-cache-list-unexpected-type",{entry:t});if(!e){const t=new URL(n,location.href);return{cacheKey:t.href,url:t.href}}const r=new URL(n,location.href),i=new URL(n,location.href);return r.searchParams.set("__WB_REVISION__",e),{cacheKey:r.href,url:i.href}}class G{constructor(){this.updatedURLs=[],this.notUpdatedURLs=[],this.handlerWillStart=async({request:t,state:e})=>{e&&(e.originalRequest=t)},this.cachedResponseWillBeUsed=async({event:t,state:e,cachedResponse:s})=>{if("install"===t.type&&e&&e.originalRequest&&e.originalRequest instanceof Request){const t=e.originalRequest.url;s?this.notUpdatedURLs.push(t):this.updatedURLs.push(t)}return s}}}class V{constructor({precacheController:t}){this.cacheKeyWillBeUsed=async({request:t,params:e})=>{const s=(null==e?void 0:e.cacheKey)||this.W.getCacheKeyForURL(t.url);return s?new Request(s,{headers:t.headers}):t},this.W=t}}let J,Q;async function X(t,e){let n=null;if(t.url){n=new URL(t.url).origin}if(n!==self.location.origin)throw new s("cross-origin-copy-response",{origin:n});const r=t.clone(),i={headers:new Headers(r.headers),status:r.status,statusText:r.statusText},a=e?e(i):i,o=function(){if(void 0===J){const t=new Response("");if("body"in t)try{new Response(t.body),J=!0}catch(t){J=!1}J=!1}return J}()?r.body:await r.blob();return new Response(o,a)}class Y extends R{constructor(t={}){t.cacheName=w(t.cacheName),super(t),this.j=!1!==t.fallbackToNetwork,this.plugins.push(Y.copyRedirectedCacheableResponsesPlugin)}async U(t,e){const s=await e.cacheMatch(t);return s||(e.event&&"install"===e.event.type?await this.S(t,e):await this.K(t,e))}async K(t,e){let n;const r=e.params||{};if(!this.j)throw new s("missing-precache-entry",{cacheName:this.cacheName,url:t.url});{const s=r.integrity,i=t.integrity,a=!i||i===s;n=await e.fetch(new Request(t,{integrity:"no-cors"!==t.mode?i||s:void 0})),s&&a&&"no-cors"!==t.mode&&(this.A(),await e.cachePut(t,n.clone()))}return n}async S(t,e){this.A();const n=await e.fetch(t);if(!await e.cachePut(t,n.clone()))throw new s("bad-precaching-response",{url:t.url,status:n.status});return n}A(){let t=null,e=0;for(const[s,n]of this.plugins.entries())n!==Y.copyRedirectedCacheableResponsesPlugin&&(n===Y.defaultPrecacheCacheabilityPlugin&&(t=s),n.cacheWillUpdate&&e++);0===e?this.plugins.push(Y.defaultPrecacheCacheabilityPlugin):e>1&&null!==t&&this.plugins.splice(t,1)}}Y.defaultPrecacheCacheabilityPlugin={cacheWillUpdate:async({response:t})=>!t||t.status>=400?null:t},Y.copyRedirectedCacheableResponsesPlugin={cacheWillUpdate:async({response:t})=>t.redirected?await X(t):t};class Z{constructor({cacheName:t,plugins:e=[],fallbackToNetwork:s=!0}={}){this.F=new Map,this.H=new Map,this.$=new Map,this.u=new Y({cacheName:w(t),plugins:[...e,new V({precacheController:this})],fallbackToNetwork:s}),this.install=this.install.bind(this),this.activate=this.activate.bind(this)}get strategy(){return this.u}precache(t){this.addToCacheList(t),this.G||(self.addEventListener("install",this.install),self.addEventListener("activate",this.activate),this.G=!0)}addToCacheList(t){const e=[];for(const n of t){"string"==typeof n?e.push(n):n&&void 0===n.revision&&e.push(n.url);const{cacheKey:t,url:r}=z(n),i="string"!=typeof n&&n.revision?"reload":"default";if(this.F.has(r)&&this.F.get(r)!==t)throw new s("add-to-cache-list-conflicting-entries",{firstEntry:this.F.get(r),secondEntry:t});if("string"!=typeof n&&n.integrity){if(this.$.has(t)&&this.$.get(t)!==n.integrity)throw new s("add-to-cache-list-conflicting-integrities",{url:r});this.$.set(t,n.integrity)}if(this.F.set(r,t),this.H.set(r,i),e.length>0){const t=`Workbox is precaching URLs without revision info: ${e.join(", ")}\nThis is generally NOT safe. Learn more at https://bit.ly/wb-precache`;console.warn(t)}}}install(t){return $(t,async()=>{const e=new G;this.strategy.plugins.push(e);for(const[e,s]of this.F){const n=this.$.get(s),r=this.H.get(e),i=new Request(e,{integrity:n,cache:r,credentials:"same-origin"});await Promise.all(this.strategy.handleAll({params:{cacheKey:s},request:i,event:t}))}const{updatedURLs:s,notUpdatedURLs:n}=e;return{updatedURLs:s,notUpdatedURLs:n}})}activate(t){return $(t,async()=>{const t=await self.caches.open(this.strategy.cacheName),e=await t.keys(),s=new Set(this.F.values()),n=[];for(const r of e)s.has(r.url)||(await t.delete(r),n.push(r.url));return{deletedURLs:n}})}getURLsToCacheKeys(){return this.F}getCachedURLs(){return[...this.F.keys()]}getCacheKeyForURL(t){const e=new URL(t,location.href);return this.F.get(e.href)}getIntegrityForCacheKey(t){return this.$.get(t)}async matchPrecache(t){const e=t instanceof Request?t.url:t,s=this.getCacheKeyForURL(e);if(s){return(await self.caches.open(this.strategy.cacheName)).match(s)}}createHandlerBoundToURL(t){const e=this.getCacheKeyForURL(t);if(!e)throw new s("non-precached-url",{url:t});return s=>(s.request=new Request(t),s.params=Object.assign({cacheKey:e},s.params),this.strategy.handle(s))}}const tt=()=>(Q||(Q=new Z),Q);class et extends r{constructor(t,e){super(({request:s})=>{const n=t.getURLsToCacheKeys();for(const r of function*(t,{ignoreURLParametersMatching:e=[/^utm_/,/^fbclid$/],directoryIndex:s="index.html",cleanURLs:n=!0,urlManipulation:r}={}){const i=new URL(t,location.href);i.hash="",yield i.href;const a=function(t,e=[]){for(const s of[...t.searchParams.keys()])e.some(t=>t.test(s))&&t.searchParams.delete(s);return t}(i,e);if(yield a.href,s&&a.pathname.endsWith("/")){const t=new URL(a.href);t.pathname+=s,yield t.href}if(n){const t=new URL(a.href);t.pathname+=".html",yield t.href}if(r){const t=r({url:i});for(const e of t)yield e.href}}(s.url,e)){const e=n.get(r);if(e){return{cacheKey:e,integrity:t.getIntegrityForCacheKey(e)}}}},t.strategy)}}t.CacheFirst=class extends R{async U(t,e){let n,r=await e.cacheMatch(t);if(!r)try{r=await e.fetchAndCachePut(t)}catch(t){t instanceof Error&&(n=t)}if(!r)throw new s("no-response",{url:t.url,error:n});return r}},t.ExpirationPlugin=class{constructor(t={}){this.cachedResponseWillBeUsed=async({event:t,request:e,cacheName:s,cachedResponse:n})=>{if(!n)return null;const r=this.V(n),i=this.J(s);b(i.expireEntries());const a=i.updateTimestamp(e.url);if(t)try{t.waitUntil(a)}catch(t){}return r?n:null},this.cacheDidUpdate=async({cacheName:t,request:e})=>{const s=this.J(t);await s.updateTimestamp(e.url),await s.expireEntries()},this.X=t,this.B=t.maxAgeSeconds,this.Y=new Map,t.purgeOnQuotaError&&function(t){g.add(t)}(()=>this.deleteCacheAndMetadata())}J(t){if(t===d())throw new s("expire-custom-caches-only");let e=this.Y.get(t);return e||(e=new F(t,this.X),this.Y.set(t,e)),e}V(t){if(!this.B)return!0;const e=this.Z(t);if(null===e)return!0;return e>=Date.now()-1e3*this.B}Z(t){if(!t.headers.has("date"))return null;const e=t.headers.get("date"),s=new Date(e).getTime();return isNaN(s)?null:s}async deleteCacheAndMetadata(){for(const[t,e]of this.Y)await self.caches.delete(t),await e.delete();this.Y=new Map}},t.NetworkFirst=class extends R{constructor(t={}){super(t),this.plugins.some(t=>"cacheWillUpdate"in t)||this.plugins.unshift(u),this.tt=t.networkTimeoutSeconds||0}async U(t,e){const n=[],r=[];let i;if(this.tt){const{id:s,promise:a}=this.et({request:t,logs:n,handler:e});i=s,r.push(a)}const a=this.st({timeoutId:i,request:t,logs:n,handler:e});r.push(a);const o=await e.waitUntil((async()=>await e.waitUntil(Promise.race(r))||await a)());if(!o)throw new s("no-response",{url:t.url});return o}et({request:t,logs:e,handler:s}){let n;return{promise:new Promise(e=>{n=setTimeout(async()=>{e(await s.cacheMatch(t))},1e3*this.tt)}),id:n}}async st({timeoutId:t,request:e,logs:s,handler:n}){let r,i;try{i=await n.fetchAndCachePut(e)}catch(t){t instanceof Error&&(r=t)}return t&&clearTimeout(t),!r&&i||(i=await n.cacheMatch(e)),i}},t.RangeRequestsPlugin=class{constructor(){this.cachedResponseWillBeUsed=async({request:t,cachedResponse:e})=>e&&t.headers.has("range")?await H(t,e):e}},t.StaleWhileRevalidate=class extends R{constructor(t={}){super(t),this.plugins.some(t=>"cacheWillUpdate"in t)||this.plugins.unshift(u)}async U(t,e){const n=e.fetchAndCachePut(t).catch(()=>{});e.waitUntil(n);let r,i=await e.cacheMatch(t);if(i);else try{i=await n}catch(t){t instanceof Error&&(r=t)}if(!i)throw new s("no-response",{url:t.url,error:r});return i}},t.cleanupOutdatedCaches=function(){self.addEventListener("activate",t=>{const e=w();t.waitUntil((async(t,e="-precache-")=>{const s=(await self.caches.keys()).filter(s=>s.includes(e)&&s.includes(self.registration.scope)&&s!==t);return await Promise.all(s.map(t=>self.caches.delete(t))),s})(e).then(t=>{}))})},t.clientsClaim=function(){self.addEventListener("activate",()=>self.clients.claim())},t.precacheAndRoute=function(t,e){!function(t){tt().precache(t)}(t),function(t){const e=tt();h(new et(e,t))}(e)},t.registerRoute=h});
+</file>
+
+<file path=".gitignore">
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+</file>
+
+<file path="AGENTS.md">
+<!-- BEGIN:nextjs-agent-rules -->
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+<!-- END:nextjs-agent-rules -->
+</file>
+
+<file path="CLAUDE.md">
+@AGENTS.md
+</file>
+
+<file path="eslint.config.mjs">
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+</file>
+
+<file path="jsconfig.json">
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+</file>
+
+<file path="next.config.mjs">
+import withPWAInit from 'next-pwa';
+
+const withPWA = withPWAInit({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+});
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Any other Next.js config options here
+};
+
+export default withPWA(nextConfig);
+</file>
+
+<file path="package.json">
+{
+  "name": "pamoja-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "firebase": "^12.16.0",
+    "lucide-react": "^1.27.0",
+    "next": "16.2.12",
+    "next-pwa": "^5.6.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.12",
+    "tailwindcss": "^4"
+  }
+}
+</file>
+
+<file path="postcss.config.mjs">
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+</file>
+
+<file path="README.md">
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+</file>
+
+</files>
