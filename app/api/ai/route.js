@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { SEED_COURSES } from '../../../lib/seedCourses';
-export const runtime = 'edge';
 
 /**
  * Pamoja Clinical Superintelligence Engine (Pamoja-MedLM)
