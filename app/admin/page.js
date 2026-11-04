@@ -247,7 +247,7 @@ export default function AdminPage() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-['Outfit'] tracking-tight text-slate-900 dark:text-white">
               Super Admin Governance, CPD Audit &amp; Voucher Control
             </h1>
-            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-normal mt-1 max-w-2xl leading-relaxed">
+            <p className="text-slate-600 dark:text-white/95 text-xs sm:text-sm font-normal mt-1 max-w-2xl leading-relaxed">
               10-Tier RBAC Matrix, Super-Admin CPD Adjustments &amp; Practical Lock Resets, and 1-Click Voucher Revocation.
             </p>
           </div>

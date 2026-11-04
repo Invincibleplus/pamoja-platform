@@ -779,7 +779,7 @@ export default function EducatorStudio() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-['Outfit'] text-slate-900 dark:text-white tracking-tight leading-tight">
                 Real-World Curriculum Canvas, Multi-Source Video &amp; AI Superintelligence
               </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mt-2 font-normal leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-white/95 max-w-2xl mt-2 font-normal leading-relaxed">
                 Author dynamic 1-to-20+ module courses (Rapid Refreshers, Clinical Certificates, and Mastery Curricula) with Sub-Topic lectures, Resource-Stratified Protocols (Tertiary vs. Rural HC III/IV), 4-Option Conditional Feedback Quizzes, and Zero-Upfront Video Hosting.
               </p>
             </div>
@@ -2068,7 +2068,7 @@ export default function EducatorStudio() {
               <h2 className="text-2xl sm:text-3xl font-black font-['Outfit'] text-slate-900 dark:text-white">
                 Cross-Course AI Precision Pathway Architect
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 max-w-3xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-white/95 mt-2 max-w-3xl leading-relaxed">
                 Index sub-topics as <strong>Atomic Learning Units (ALUs)</strong> across multiple professors&apos; curricula. Pamoja-MedLM weaves a precision pathway for any clinical goal and calculates fractional royalties per seat-time minute.
               </p>
 

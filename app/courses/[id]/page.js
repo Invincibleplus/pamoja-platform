@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../../components/AuthProvider';
 import { SEED_COURSES, getCourseFormatBadge } from '../../../lib/seedCourses';
@@ -46,8 +46,6 @@ import {
   RefreshCw,
   ShieldCheck
 } from 'lucide-react';
-
-export const runtime = 'edge';
 
 // Clean medical formatting helper (parses **bold**, headings, and bullets without raw syntax)
 function renderFormattedContent(content) {
@@ -227,6 +225,61 @@ export default function CoursePage({ params }) {
     } catch { }
   }, [course?.id]);
 
+  const unlockCourseWithVoucherOrPayment = useCallback(async (label = 'Voucher Redeemed', codeUsed = 'PAMOJA2026') => {
+    if (!course) return;
+    const count = course.modules?.length || 1;
+    const nextCourses = Array.from(
+      new Set([...(profile?.purchasedCourses || []), ...(profile?.enrolledCourses || []), course.id])
+    );
+    if (updateProfileState) {
+      await updateProfileState({
+        purchasedCourses: nextCourses,
+        enrolledCourses: nextCourses
+      });
+    }
+    await upsertTransaction({
+      id: `tx_course_${Date.now()}`,
+      userUid: profile?.id || user?.uid || 'learner',
+      userName: profile?.name || 'Clinician',
+      courseId: course.id,
+      itemTitle: course.title,
+      amount: 0,
+      rail: 'smart_voucher',
+      voucherCode: codeUsed,
+      timestamp: new Date().toISOString()
+    });
+    const msg = `${label}! All ${count} ${count === 1 ? 'Module' : 'Modules'} of "${course.title}" are now unlocked.`;
+    setInlineVoucherNotice({ type: 'success', text: msg });
+    if (showToast) showToast(msg, 'success');
+  }, [course, profile, updateProfileState, upsertTransaction, showToast]);
+
+  // Path 3: URL Auto-Redeem (?voucher=CODE) on Course Page
+  useEffect(() => {
+    if (typeof window === 'undefined' || !course?.id) return;
+    const params = new URLSearchParams(window.location.search);
+    const urlVoucher = params.get('voucher');
+    if (urlVoucher) {
+      const clean = urlVoucher.trim().toUpperCase();
+      const found = (vouchers || []).find((v) => v.code?.toUpperCase() === clean);
+      if (found && (found.status === 'Revoked' || found.active === false)) {
+        if (showToast) {
+          showToast(`Voucher ${clean} has been revoked and cannot be redeemed.`, 'error');
+        }
+        return;
+      }
+      if (
+        clean === 'PAMOJA2026' ||
+        clean === 'FREE100' ||
+        clean.startsWith('PMJ-') ||
+        clean.startsWith('MOH-') ||
+        clean.startsWith('UNFPA-')
+      ) {
+        unlockCourseWithVoucherOrPayment(`URL Scholarship Voucher (${clean}) Applied`, clean);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, [course?.id, vouchers, unlockCourseWithVoucherOrPayment, showToast]);
+
   if (!course) {
     return (
       <div className="min-h-screen pamoja-shell flex flex-col items-center justify-center text-slate-800 dark:text-white p-6">
@@ -257,32 +310,6 @@ export default function CoursePage({ params }) {
     (course.pricingModel === 'premium' ||
       (course.pricingModel === 'freemium' && selectedModIdx >= freeModLimit));
 
-  const unlockCourseWithVoucherOrPayment = async (label = 'Voucher Redeemed', codeUsed = 'PAMOJA2026') => {
-    const nextCourses = Array.from(
-      new Set([...(profile?.purchasedCourses || []), ...(profile?.enrolledCourses || []), course.id])
-    );
-    if (updateProfileState) {
-      await updateProfileState({
-        purchasedCourses: nextCourses,
-        enrolledCourses: nextCourses
-      });
-    }
-    await upsertTransaction({
-      id: `tx_course_${Date.now()}`,
-      userUid: profile?.id || user?.uid || 'learner',
-      userName: profile?.name || 'Clinician',
-      courseId: course.id,
-      itemTitle: course.title,
-      amount: 0,
-      rail: 'smart_voucher',
-      voucherCode: codeUsed,
-      timestamp: new Date().toISOString()
-    });
-    const msg = `${label}! All ${modCount} ${modCount === 1 ? 'Module' : 'Modules'} of "${course.title}" are now unlocked.`;
-    setInlineVoucherNotice({ type: 'success', text: msg });
-    if (showToast) showToast(msg, 'success');
-  };
-
   const handleInlineVoucherSubmit = async (e) => {
     e.preventDefault();
     const code = (inlineVoucherInput || '').trim().toUpperCase();
@@ -312,33 +339,6 @@ export default function CoursePage({ params }) {
       if (showToast) showToast(errMsg, 'error');
     }
   };
-
-  // Path 3: URL Auto-Redeem (?voucher=CODE) on Course Page
-  useEffect(() => {
-    if (typeof window === 'undefined' || !course?.id) return;
-    const params = new URLSearchParams(window.location.search);
-    const urlVoucher = params.get('voucher');
-    if (urlVoucher) {
-      const clean = urlVoucher.trim().toUpperCase();
-      const found = (vouchers || []).find((v) => v.code?.toUpperCase() === clean);
-      if (found && (found.status === 'Revoked' || found.active === false)) {
-        if (showToast) {
-          showToast(`Voucher ${clean} has been revoked and cannot be redeemed.`, 'error');
-        }
-        return;
-      }
-      if (
-        clean === 'PAMOJA2026' ||
-        clean === 'FREE100' ||
-        clean.startsWith('PMJ-') ||
-        clean.startsWith('MOH-') ||
-        clean.startsWith('UNFPA-')
-      ) {
-        unlockCourseWithVoucherOrPayment(`URL Scholarship Voucher (${clean}) Applied`, clean);
-        window.history.replaceState({}, '', window.location.pathname);
-      }
-    }
-  }, [course?.id, vouchers]);
 
   // Calculate total sub-topics in course for real-time progress tracking
   const totalCourseTopics =

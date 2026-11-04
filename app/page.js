@@ -221,7 +221,7 @@ export default function HomePage() {
                     alt={course.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <span className="absolute top-3 right-3 bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-white border border-slate-200/90 dark:border-slate-700/80 text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-10 pointer-events-none backdrop-blur-md">
+                  <span className="absolute top-3 right-3 badge-on-image bg-slate-900/85 text-white border border-white/20 text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-10 pointer-events-none backdrop-blur-md">
                     {course.category}
                   </span>
                 </div>
@@ -438,7 +438,7 @@ export default function HomePage() {
                       alt={course.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <span className="absolute top-3 right-3 bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-white border border-slate-200/90 dark:border-slate-700/80 text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-10 pointer-events-none backdrop-blur-md">
+                    <span className="absolute top-3 right-3 badge-on-image bg-slate-900/85 text-white border border-white/20 text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-10 pointer-events-none backdrop-blur-md">
                       {course.category}
                     </span>
                   </div>

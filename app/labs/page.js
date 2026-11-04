@@ -611,7 +611,7 @@ function LabsContent() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-['Outfit'] text-slate-900 dark:text-white tracking-tight leading-tight">
                 Simulation Centers &amp; Practical Skills Sign-Off
               </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mt-2 font-normal leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-white/95 max-w-2xl mt-2 font-normal leading-relaxed">
                 Filter centers by Country, Facility Tier, and Specialty. Every booking generates a verified QR Appointment Pass synced with the Facility Coordinator and OSCE Examiner Roster.
               </p>
             </div>
@@ -622,7 +622,7 @@ function LabsContent() {
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'centers'
                     ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md'
-                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
                 }`}
               >
                 <MapPin size={15} /> Sim Centers ({filteredLabs.length})
@@ -633,7 +633,7 @@ function LabsContent() {
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'convener'
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
                 }`}
               >
                 <ClipboardCheck size={15} /> Convener Portal
@@ -644,7 +644,7 @@ function LabsContent() {
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'ldhf'
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200'
                 }`}
               >
                 <Activity size={15} /> 8-12 Wk LDHF Loop
@@ -658,7 +658,7 @@ function LabsContent() {
               <div className="font-black text-cyan-700 dark:text-cyan-400 uppercase text-[10px] mb-1">
                 1. Student Books Practical Date
               </div>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-slate-700 dark:text-slate-200 leading-relaxed">
                 Selects an upcoming recurring Friday/monthly session and receives a QR Appointment Pass (`PMJ-LAB-XXXX`) with facility contact details.
               </p>
             </div>
@@ -666,7 +666,7 @@ function LabsContent() {
               <div className="font-black text-emerald-700 dark:text-emerald-400 uppercase text-[10px] mb-1">
                 2. Venue Confirmed 72h Prior
               </div>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-slate-700 dark:text-slate-200 leading-relaxed">
                 Hospital Skills Lab Coordinator verifies room &amp; manikin readiness 72 hours before the session so no clinician travels in vain.
               </p>
             </div>
@@ -674,7 +674,7 @@ function LabsContent() {
               <div className="font-black text-purple-700 dark:text-purple-400 uppercase text-[10px] mb-1">
                 3. Live Convener Roster &amp; Sign-Off
               </div>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-slate-700 dark:text-slate-200 leading-relaxed">
                 Examiner views the live roster, grades the 3 OSCE stations (&ge; 80%), and releases the locked course CPD points.
               </p>
             </div>

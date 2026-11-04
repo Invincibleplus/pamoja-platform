@@ -1504,14 +1504,14 @@ const HomeView = ({ setView, setCourseId }) => {
           </div>
           <h3 className="text-xl font-bold text-slate-800">Your Clinical Journey Starts Here</h3>
           <p className="text-slate-500 leading-relaxed text-sm">
-            We've curated 10-module accredited curricula based on evidence-based global clinical toolkits:
+            We&apos;ve curated 10-module accredited curricula based on evidence-based global clinical toolkits:
           </p>
           <ul className="text-left flex flex-col gap-4 text-sm font-medium text-slate-700 bg-slate-50 p-6 rounded-2xl border border-slate-100">
             <li className="flex gap-3"><BookOpen className="text-cyan-500 shrink-0"/> Complete sub-topics and interactive Knowledge Checks with instant clinical feedback and auto-advance.</li>
             <li className="flex gap-3"><Calendar className="text-indigo-500 shrink-0"/> Courses requiring practical validation hold your CPD points in Escrow until your Simulation Lab is booked and completed.</li>
             <li className="flex gap-3"><Bot className="text-purple-500 shrink-0"/> Consult Dr. Pam, your AI clinical mentor, anytime in the bottom-right corner.</li>
           </ul>
-          <Button onClick={closeTour} className="w-full">Let's Get Started</Button>
+          <Button onClick={closeTour} className="w-full">Let&apos;s Get Started</Button>
         </div>
       </Modal>
 
@@ -2364,8 +2364,8 @@ const StudioView = () => {
   const generateAIQuiz = async (mIdx) => {
     setGeneratingQuizId(`${mIdx}`);
     try {
-      const module = form.modules[mIdx];
-      const topicContext = (module.topics || []).map(t => `${t.title}:\n${t.content}`).join('\n\n');
+      const targetModule = form.modules[mIdx];
+      const topicContext = (targetModule?.topics || []).map(t => `${t.title}:\n${t.content}`).join('\n\n');
       
       const prompt = `You are a medical education expert. Based on the following curriculum content, generate a single clinical multiple-choice question.\n\nCurriculum Content:\n${topicContext || 'General medical protocols for clinical practice.'}`;
 
