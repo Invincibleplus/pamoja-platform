@@ -2,16 +2,19 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "pamoja-platform",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2024-09-23",
+  "compatibility_date": "2025-05-05",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "global_fetch_strictly_public"
   ],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "build": {
+    "command": "npm i --no-save --force @opennextjs/cloudflare@1.20.16 && npx opennextjs-cloudflare build"
+  },
   "observability": {
     "enabled": true
   }
 }
-
