@@ -47,6 +47,8 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
+export const runtime = 'edge';
+
 // Clean medical formatting helper (parses **bold**, headings, and bullets without raw syntax)
 function renderFormattedContent(content) {
   if (!content) return null;
@@ -222,7 +224,7 @@ export default function CoursePage({ params }) {
           setIsLocallyUnlocked(true);
         }
       }
-    } catch {}
+    } catch { }
   }, [course?.id]);
 
   if (!course) {
@@ -487,15 +489,15 @@ export default function CoursePage({ params }) {
       recurringCompletedList.length > 0
         ? CREDENTIAL_TIERS.RECURRING_SUSTAINED
         : course.requiresLab
-        ? CREDENTIAL_TIERS.THEORY_MILESTONE
-        : CREDENTIAL_TIERS.FULL_CERTIFICATE;
+          ? CREDENTIAL_TIERS.THEORY_MILESTONE
+          : CREDENTIAL_TIERS.FULL_CERTIFICATE;
 
     const tierLabel =
       recurringCompletedList.length > 0
         ? 'Milestone + Recurring LDHF Sustained Credential'
         : course.requiresLab
-        ? 'Milestone 1: Theory Mastery & OSCE Admission Credential'
-        : 'Full Statutory Accredited CPD Certificate';
+          ? 'Milestone 1: Theory Mastery & OSCE Admission Credential'
+          : 'Full Statutory Accredited CPD Certificate';
 
     const signedCert = await mintSignedCertificate({
       existingCertId: existingCourseCertificate?.id || `cert-${course.id}-${user?.uid || 'prac'}`,
@@ -672,7 +674,7 @@ export default function CoursePage({ params }) {
             window.localStorage.setItem('pamoja_active_profile_v11', JSON.stringify(merged));
             window.dispatchEvent(new CustomEvent('pamoja-rt-sync', { detail: { key: 'profile' } }));
             window.dispatchEvent(new Event('storage'));
-          } catch (e) {}
+          } catch (e) { }
         }
 
         if (showToast) {
@@ -780,34 +782,31 @@ export default function CoursePage({ params }) {
             <div className="hidden sm:flex items-center gap-2">
               <button
                 onClick={() => setCheckoutOpen(true)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                  isCourseUnlocked
+                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${isCourseUnlocked
                     ? 'bg-emerald-950/60 border-emerald-700 text-emerald-300'
                     : 'bg-cyan-950/80 border-cyan-700 text-cyan-300 hover:bg-cyan-900'
-                }`}
+                  }`}
               >
                 <Ticket size={13} />
                 {isCourseUnlocked ? 'Course Unlocked ✓' : 'Redeem Voucher / Unlock'}
               </button>
               <button
                 onClick={() => setIsPreTestModalOpen(true)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
-                  preTestScore !== null
+                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${preTestScore !== null
                     ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300'
                     : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-cyan-500'
-                }`}
+                  }`}
               >
                 Pre-Test: {preTestScore !== null ? `${preTestScore}%` : 'Take'}
               </button>
               <button
                 onClick={() => setIsPostTestModalOpen(true)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
-                  postTestScore !== null
+                className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${postTestScore !== null
                     ? isRegressed
                       ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-300 animate-pulse'
                       : 'bg-cyan-50 dark:bg-cyan-950/60 border-cyan-300 dark:border-cyan-700 text-cyan-800 dark:text-cyan-300'
                     : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-cyan-500'
-                }`}
+                  }`}
               >
                 Post-Test: {postTestScore !== null ? `${postTestScore}%` : 'Take'}
               </button>
@@ -967,11 +966,10 @@ export default function CoursePage({ params }) {
 
                   {inlineVoucherNotice && (
                     <div
-                      className={`p-3 rounded-xl border text-xs font-bold text-left ${
-                        inlineVoucherNotice.type === 'success'
+                      className={`p-3 rounded-xl border text-xs font-bold text-left ${inlineVoucherNotice.type === 'success'
                           ? 'bg-emerald-950/60 border-emerald-700 text-emerald-200'
                           : 'bg-rose-950/60 border-rose-700 text-rose-200'
-                      }`}
+                        }`}
                     >
                       {inlineVoucherNotice.text}
                     </div>
@@ -1022,11 +1020,10 @@ export default function CoursePage({ params }) {
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
-                          className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${
-                            isActive
+                          className={`flex items-center gap-2 px-4 py-3 text-xs font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${isActive
                               ? 'border-cyan-600 dark:border-cyan-400 text-cyan-700 dark:text-cyan-400 bg-cyan-50/80 dark:bg-cyan-950/30'
                               : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                          }`}
+                            }`}
                         >
                           <Icon size={15} />
                           {tab.label}
@@ -1036,590 +1033,584 @@ export default function CoursePage({ params }) {
                   </div>
                 </div>
 
-            {/* TAB 1: CURRICULUM & RESOURCE-STRATIFIED CLINICAL PROTOCOL */}
-            {activeTab === 'curriculum' && (
-              <div className="space-y-6 animate-fade-in">
-                {/* Resource-Stratified Clinical Protocol Switcher */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-xl">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
-                    <div>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 text-[11px] font-black uppercase tracking-wider mb-1">
-                        <Sliders size={13} className="text-cyan-600 dark:text-cyan-400" /> Resource-Stratified Clinical Protocol Switcher
-                      </div>
-                      <h3 className="text-lg font-bold font-['Outfit'] text-slate-900 dark:text-white">
-                        Standardized Care Adapted to Your Facility Tier
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Switch between Tertiary Gold-Standard care and Rural HC III/IV resource-adapted stabilization protocols.
-                      </p>
-                    </div>
-
-                    <div className="flex rounded-xl bg-slate-100 dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800 flex-shrink-0">
-                      <button
-                        onClick={() => setResourceTier('gold')}
-                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          resourceTier === 'gold'
-                            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        <Building size={14} /> Gold-Standard Tertiary
-                      </button>
-                      <button
-                        onClick={() => setResourceTier('rural')}
-                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          resourceTier === 'rural'
-                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md'
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        <Stethoscope size={14} /> Rural HC III / HC IV
-                      </button>
-                    </div>
-                  </div>
-
-                  {resourceTier === 'gold' ? (
-                    <div className="bg-gradient-to-br from-cyan-50/80 to-slate-50 dark:from-cyan-950/40 dark:to-slate-900 border border-cyan-200 dark:border-cyan-800/60 rounded-2xl p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-black uppercase tracking-wider text-cyan-700 dark:text-cyan-400 flex items-center gap-1.5">
-                          <Building size={15} /> Tertiary Hospital Protocol (Full Resources)
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            Blood Bank Ready
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            Operating Theatre Active
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            TXA &amp; Oxytocin Stocked
-                          </span>
-                        </div>
-                      </div>
-
-                      {currentTopic?.goldProtocol ? (
-                        <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
-                          {currentTopic.goldProtocol}
-                        </p>
-                      ) : (
-                        <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                          <p>
-                            <strong className="text-slate-900 dark:text-white">1. Diagnostic Confirmation:</strong> Utilize calibrated V-shaped blood collection drape. Immediate quantitative confirmation of &ge; 500 mL triggers bundle activation within 60 seconds.
-                          </p>
-                          <p>
-                            <strong className="text-slate-900 dark:text-white">2. Parallel First-Response Bundle:</strong> Initiate continuous bimanual fundal massage; administer Oxytocin 10 IU IM and simultaneously start Tranexamic Acid (TXA) 1g IV over 10 minutes (within 3-hour golden window).
-                          </p>
-                          <p>
-                            <strong className="text-slate-900 dark:text-white">3. Aggressive Fluid &amp; Transfusion:</strong> Dual 16G IV cannulas with warm Ringer&apos;s Lactate. Initiate cross-match and emergency 1:1:1 component therapy (PRBC/FFP/Platelets) if Shock Index &ge; 0.9.
-                          </p>
-                          <p>
-                            <strong className="text-slate-900 dark:text-white">4. Theater Escalation:</strong> Direct transfer to operating theatre for uterine artery embolization, B-Lynch brace suturing, or peripartum hysterectomy if bleeding persists past 20 minutes.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="bg-gradient-to-br from-amber-50/80 to-slate-50 dark:from-amber-950/40 dark:to-slate-900 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                          <Stethoscope size={15} /> Rural Health Centre III/IV Stabilization Protocol
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                            Emergency Condom UBT
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
-                            NASG Anti-Shock Garment
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
-                            Manual Aortic Compression
-                          </span>
-                        </div>
-                      </div>
-
-                      {currentTopic?.ruralProtocol || currentTopic?.hc3Adaptation ? (
-                        <p className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line">
-                          {currentTopic.ruralProtocol || currentTopic.hc3Adaptation}
-                        </p>
-                      ) : (
-                        <div className="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                          <p>
-                            <strong>1. Resource-Adapted Quantification:</strong> If pre-packaged calibrated drapes are out of stock, use a clean plastic receiver or gravimetric gauze weighing (1g = 1 mL blood). Never rely on visual guesswork.
-                          </p>
-                          <p>
-                            <strong>2. Immediate First-Line Uterotonics:</strong> Oxytocin 10 IU IM. If cold-chain failure or oxytocin is absent, administer sublingual Misoprostol 800 mcg immediately.
-                          </p>
-                          <p>
-                            <strong>3. Mechanical Tamponade (Condom UBT):</strong> Tie a sterile lubricated condom to a Foley catheter with silk suture; insert into the uterine cavity and inflate with 300–500 mL of sterile saline until bleeding stops.
-                          </p>
-                          <p>
-                            <strong>4. NASG &amp; Transfer Handshake:</strong> Apply Non-Pneumatic Anti-Shock Garment (NASG) starting from ankle segments 1-3 up to abdominal ball segment 6. Maintain continuous External Aortic Compression during ambulance transit and execute SBAR phone escalation to the referral hospital.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Sub-Topic Content Body */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl">
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider">
-                      Module {selectedModIdx + 1} &bull; Topic {selectedTopIdx + 1}
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-md bg-cyan-50 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800 text-[10px] font-bold">
-                      Competency: {currentTopic?.competencyTag || `ALU-${selectedModIdx + 1}.${selectedTopIdx + 1}`}
-                    </span>
-                  </div>
-
-                  <h2 className="text-xl sm:text-2xl font-black font-['Outfit'] text-slate-900 dark:text-white mb-6">
-                    {currentTopic?.title}
-                  </h2>
-
-                  <div className="prose prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed space-y-4">
-                    {currentTopic?.content?.split('\n\n').map((paragraph, pIdx) => (
-                      <p key={pIdx} className="whitespace-pre-line">
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-
-                  {/* Attached Learning Resources */}
-                  {currentTopic?.resources && currentTopic.resources.length > 0 && (
-                    <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
-                      <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <FileText size={14} className="text-cyan-600 dark:text-cyan-400" /> Attached Clinical Resources &amp; Shared Drive Materials
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {currentTopic.resources.map((res, rIdx) => (
-                          <a
-                            key={rIdx}
-                            href={res.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-cyan-500 transition-all text-xs font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-                          >
-                            <span className="truncate pr-2">{res.title}</span>
-                            <ExternalLink size={14} className="text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Banner to Quiz */}
-                  <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Completed reading this sub-topic? Verify clinical mastery with the option-specific conditional quiz.
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('quiz')}
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md cursor-pointer"
-                    >
-                      Start Sub-Topic Quiz <ArrowRight size={15} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: CLINICAL SIMULATION STATIONS (Engines A, B, D) */}
-            {activeTab === 'simulation' && (
-              <div className="space-y-6 animate-fade-in">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-4 flex flex-wrap gap-2 shadow-sm">
-                  {[
-                    { id: 'engineA', label: 'Engine A: 90s Action Sequencer', icon: Activity, tag: 'Physiological Clock' },
-                    { id: 'engineB', label: 'Engine B: Voice SBAR Handover Grader', icon: Mic, tag: 'Communication' },
-                    { id: 'engineD', label: 'Engine D: 3D WebAR Pocket Manikin', icon: Box, tag: 'Spatial Computing' }
-                  ].map((engine) => {
-                    const Icon = engine.icon;
-                    const isCurrent = selectedEngine === engine.id;
-                    const score = simScores[engine.id];
-                    return (
-                      <button
-                        key={engine.id}
-                        onClick={() => setSelectedEngine(engine.id)}
-                        className={`flex-1 min-w-[200px] flex items-center justify-between p-3.5 rounded-xl border text-left transition-all ${
-                          isCurrent
-                            ? 'bg-slate-950 border-cyan-500 text-white shadow-lg'
-                            : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Icon size={18} className={isCurrent ? 'text-cyan-400' : 'text-slate-500'} />
-                          <div>
-                            <div className="text-xs font-bold">{engine.label}</div>
-                            <div className="text-[10px] text-slate-500">{engine.tag}</div>
+                {/* TAB 1: CURRICULUM & RESOURCE-STRATIFIED CLINICAL PROTOCOL */}
+                {activeTab === 'curriculum' && (
+                  <div className="space-y-6 animate-fade-in">
+                    {/* Resource-Stratified Clinical Protocol Switcher */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-xl">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+                        <div>
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 text-[11px] font-black uppercase tracking-wider mb-1">
+                            <Sliders size={13} className="text-cyan-600 dark:text-cyan-400" /> Resource-Stratified Clinical Protocol Switcher
                           </div>
-                        </div>
-                        {score !== null && (
-                          <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-black">
-                            {score}%
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {selectedEngine === 'engineA' && (
-                  <ActionSequencer
-                    onComplete={({ score }) => {
-                      setSimScores((prev) => ({ ...prev, engineA: score }));
-                    }}
-                  />
-                )}
-
-                {selectedEngine === 'engineB' && (
-                  <SbarHandover
-                    onComplete={({ totalScore }) => {
-                      setSimScores((prev) => ({ ...prev, engineB: totalScore }));
-                    }}
-                  />
-                )}
-
-                {selectedEngine === 'engineD' && (
-                  <WebArPocketManikin
-                    onComplete={(score) => {
-                      setSimScores((prev) => ({ ...prev, engineD: score }));
-                    }}
-                  />
-                )}
-              </div>
-            )}
-
-            {/* TAB 3: SUB-TOPIC GAMIFIED QUIZZES WITH OPTION-SPECIFIC FEEDBACK & 3S AUTO-ADVANCE */}
-            {activeTab === 'quiz' && (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl animate-fade-in space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 text-[11px] font-black uppercase tracking-wider mb-1">
-                      <Award size={13} className="text-cyan-600 dark:text-cyan-400" /> Sub-Topic Gamified Mastery Check
-                    </div>
-                    <h3 className="text-xl font-bold font-['Outfit'] text-slate-900 dark:text-white">
-                      Instant Feedback &amp; Option Rationale Engine
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Every option reveals its specific clinical rationale. Pass all questions to auto-advance in 3 seconds.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-amber-700 dark:text-amber-400 flex-shrink-0">
-                    <Shield size={14} /> Manual Skip Blocked
-                  </div>
-                </div>
-
-                {autoAdvanceTimer !== null && (
-                  <div className="bg-gradient-to-r from-emerald-950 to-cyan-950 border-2 border-emerald-500 rounded-2xl p-4 text-white shadow-xl flex items-center justify-between gap-4 animate-bounce">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 size={24} className="text-emerald-400" />
-                      <div>
-                        <div className="text-sm font-bold font-['Outfit']">
-                          All clinical answers verified!
-                        </div>
-                        <div className="text-xs text-emerald-300">
-                          Auto-advancing to the next sub-topic in <strong>{countdownSeconds} seconds...</strong>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={advanceToNextTopic}
-                      className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex-shrink-0 shadow-md cursor-pointer"
-                    >
-                      Advance Now &rarr;
-                    </button>
-                  </div>
-                )}
-
-                {currentQuiz.length > 0 ? (
-                  currentQuiz.map((q, qIdx) => {
-                    const selectedOpt = quizState[qIdx];
-                    const isAnswered = selectedOpt !== undefined;
-                    const isCorrect = Number(selectedOpt) === Number(q.correctIndex);
-
-                    return (
-                      <div
-                        key={qIdx}
-                        className={`p-5 sm:p-6 rounded-2xl border transition-all ${
-                          isAnswered
-                            ? isCorrect
-                              ? 'bg-emerald-50/70 dark:bg-slate-950/70 border-emerald-300 dark:border-emerald-800'
-                              : 'bg-rose-50/70 dark:bg-slate-950/70 border-rose-300 dark:border-rose-800'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3 mb-4">
-                          <span className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800 text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">
-                            {qIdx + 1}
-                          </span>
-                          <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
-                            {q.question}
-                          </h4>
+                          <h3 className="text-lg font-bold font-['Outfit'] text-slate-900 dark:text-white">
+                            Standardized Care Adapted to Your Facility Tier
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Switch between Tertiary Gold-Standard care and Rural HC III/IV resource-adapted stabilization protocols.
+                          </p>
                         </div>
 
-                        <div className="space-y-2.5">
-                          {q.options.map((optionText, optIdx) => {
-                            const isThisSelected = selectedOpt === optIdx;
-                            const isThisCorrect = optIdx === Number(q.correctIndex);
-
-                            let btnStyle =
-                              'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-300 hover:border-cyan-500 dark:hover:border-slate-600';
-                            if (isAnswered) {
-                              if (isThisSelected) {
-                                btnStyle = isThisCorrect
-                                  ? 'bg-emerald-600 text-white border-emerald-600 font-semibold shadow-xs'
-                                  : 'bg-rose-600 text-white border-rose-600 font-semibold shadow-xs';
-                              } else if (isThisCorrect) {
-                                btnStyle = 'bg-emerald-50 dark:bg-slate-900 border-emerald-300 dark:border-emerald-700/60 text-emerald-800 dark:text-emerald-300 font-bold';
-                              } else {
-                                btnStyle =
-                                  'bg-slate-100/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/60 text-slate-400 opacity-60';
-                              }
-                            }
-
-                            return (
-                              <button
-                                key={optIdx}
-                                onClick={() => handleSelectQuizOption(qIdx, optIdx)}
-                                className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-start gap-3 cursor-pointer ${btnStyle}`}
-                              >
-                                <span className="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  {String.fromCharCode(65 + optIdx)}
-                                </span>
-                                <span className="text-xs sm:text-sm leading-relaxed flex-1">
-                                  {optionText}
-                                </span>
-                                {isAnswered &&
-                                  isThisSelected &&
-                                  (isThisCorrect ? (
-                                    <CheckCircle
-                                      size={16}
-                                      className="text-white flex-shrink-0 mt-0.5"
-                                    />
-                                  ) : (
-                                    <XCircle
-                                      size={16}
-                                      className="text-white flex-shrink-0 mt-0.5"
-                                    />
-                                  ))}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {isAnswered && (
-                          <div
-                            className={`mt-4 p-4 rounded-xl border text-xs sm:text-sm leading-relaxed animate-fade-in ${
-                              isCorrect
-                                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
-                                : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200'
-                            }`}
+                        <div className="flex rounded-xl bg-slate-100 dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800 flex-shrink-0">
+                          <button
+                            onClick={() => setResourceTier('gold')}
+                            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${resourceTier === 'gold'
+                                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                                : 'text-slate-400 hover:text-slate-200'
+                              }`}
                           >
-                            <div className="font-bold flex items-center gap-1.5 mb-1">
-                              {isCorrect ? (
-                                <>
-                                  <CheckCircle size={15} className="text-emerald-400" />
-                                  Clinical Rationale (Option {String.fromCharCode(65 + selectedOpt)}):
-                                </>
-                              ) : (
-                                <>
-                                  <AlertTriangle size={15} className="text-rose-400" />
-                                  Why Option {String.fromCharCode(65 + selectedOpt)} is Clinically Incorrect:
-                                </>
-                              )}
-                            </div>
-                            <p className="opacity-95">
-                              {q.optionFeedback && q.optionFeedback[selectedOpt]
-                                ? q.optionFeedback[selectedOpt]
-                                : isCorrect
-                                ? q.explanation ||
-                                  'Correct! This matches the national clinical treatment protocol.'
-                                : q.explanation
-                                ? `Incorrect. Clinical rationale: ${q.explanation}`
-                                : 'This choice does not follow standard clinical protocol.'}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-sm text-slate-400 text-center py-8">
-                    No micro-quiz attached to this sub-topic. Continue to the next unit.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* TAB 4: DR. PAM CLINICAL INTELLIGENCE & DIRECT PROFESSOR Q&A */}
-            {activeTab === 'drpam' && (
-              <div className="space-y-6 animate-fade-in">
-                {/* Dr. Pam Clinical Intelligence Card */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-xl space-y-4">
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
-                        <Sparkles size={20} />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold font-['Outfit'] text-slate-900 dark:text-white">
-                          Dr. Pam — Clinical Study Assistant
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Answers based on {course.title} &amp; approved Ministry of Health guidelines
-                        </p>
-                      </div>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
-                      &bull; Online &amp; Ready
-                    </span>
-                  </div>
-
-                  {/* Message Log */}
-                  <div className="space-y-3 max-h-[360px] overflow-y-auto pr-2">
-                    {drPamMessages.map((msg, idx) => (
-                      <div key={idx} className="space-y-2">
-                        <div
-                          className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                        >
-                          <div
-                            className={`max-w-[85%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed shadow-xs ${
-                              msg.sender === 'user'
-                                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-tr-none whitespace-pre-line'
-                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
-                            }`}
+                            <Building size={14} /> Gold-Standard Tertiary
+                          </button>
+                          <button
+                            onClick={() => setResourceTier('rural')}
+                            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${resourceTier === 'rural'
+                                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md'
+                                : 'text-slate-400 hover:text-slate-200'
+                              }`}
                           >
-                            {msg.sender === 'user' ? msg.text : renderFormattedContent(msg.text)}
-                          </div>
+                            <Stethoscope size={14} /> Rural HC III / HC IV
+                          </button>
                         </div>
+                      </div>
 
-                        {/* Interactive Course Enrollment Card */}
-                        {msg.enrolledCourse && (
-                          <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/80 rounded-2xl p-4 space-y-2.5 shadow-md animate-fade-in max-w-[85%]">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                                <CheckCircle size={14} className="text-emerald-600 dark:text-emerald-400" /> Course Enrolled &amp; Unlocked
+                      {resourceTier === 'gold' ? (
+                        <div className="bg-gradient-to-br from-cyan-50/80 to-slate-50 dark:from-cyan-950/40 dark:to-slate-900 border border-cyan-200 dark:border-cyan-800/60 rounded-2xl p-5">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-black uppercase tracking-wider text-cyan-700 dark:text-cyan-400 flex items-center gap-1.5">
+                              <Building size={15} /> Tertiary Hospital Protocol (Full Resources)
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                Blood Bank Ready
                               </span>
-                              <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400">
-                                +{msg.enrolledCourse.cpd || course.cpd || 15} CPD Points
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                Operating Theatre Active
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                TXA &amp; Oxytocin Stocked
                               </span>
                             </div>
-                            <div className="text-xs font-bold text-slate-900 dark:text-white">
-                              {msg.enrolledCourse.title}
-                            </div>
-                            <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                              All modules, clinical simulation stations, and OSCE assessments are now active and ready for your learning journey.
+                          </div>
+
+                          {currentTopic?.goldProtocol ? (
+                            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
+                              {currentTopic.goldProtocol}
                             </p>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedModIdx(0);
-                                setSelectedTopIdx(0);
-                                setActiveTab('curriculum');
-                              }}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-sm transition-all cursor-pointer"
-                            >
-                              <PlayCircle size={14} /> Start Module 1 Now &rarr;
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    {isPamThinking && (
-                      <div className="flex justify-start">
-                        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
-                          Dr. Pam Clinical Intelligence is cross-referencing module protocols...
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Input Form */}
-                  <form onSubmit={handleDrPamSubmit} className="flex gap-2 pt-2">
-                    <input
-                      type="text"
-                      value={drPamQuery}
-                      onChange={(e) => setDrPamQuery(e.target.value)}
-                      placeholder="Ask Dr. Pam about dosages, protocols, or rural HC III/IV adaptations..."
-                      className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isPamThinking}
-                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-sm"
-                    >
-                      <Send size={14} /> Ask Dr. Pam
-                    </button>
-                  </form>
-                </div>
-
-                {/* Direct Question to Authoring Professor (Syncs to Educator Studio Q&A Desk) */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-xl space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-                    <div>
-                      <h4 className="text-sm font-bold font-['Outfit'] text-slate-900 dark:text-white flex items-center gap-2">
-                        <MessageCircle size={16} className="text-cyan-600 dark:text-cyan-400" />
-                        Ask Lead Authoring Professor ({course.instructor || 'Faculty Q&A Desk'})
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Questions submitted here route in real time to the Educator Studio Q&amp;A Desk.
-                      </p>
-                    </div>
-                  </div>
-
-                  {profQuestionSubmitted && (
-                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
-                      Your clinical question has been sent to the Professor&apos;s Educator Studio Q&amp;A Desk!
-                    </div>
-                  )}
-
-                  <form onSubmit={handleAskProfessorSubmit} className="flex gap-2">
-                    <input
-                      type="text"
-                      value={profQuestionInput}
-                      onChange={(e) => setProfQuestionInput(e.target.value)}
-                      placeholder="Submit a clinical case question for direct faculty verification..."
-                      className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500"
-                    />
-                    <button
-                      type="submit"
-                      className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-cyan-700 dark:text-cyan-400 border border-slate-200 dark:border-cyan-800 font-bold text-xs whitespace-nowrap cursor-pointer transition-colors"
-                    >
-                      Send to Professor
-                    </button>
-                  </form>
-
-                  {courseQuestions.length > 0 && (
-                    <div className="space-y-3 pt-3">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Recent Faculty Q&amp;A Threads ({courseQuestions.length})
-                      </div>
-                      {courseQuestions.map((q) => (
-                        <div
-                          key={q.id}
-                          className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs"
-                        >
-                          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                            <span className="font-bold text-slate-800 dark:text-slate-200">{q.studentName}</span>
-                            <span>{q.timestamp}</span>
-                          </div>
-                          <p className="text-slate-700 dark:text-slate-300">&ldquo;{q.question}&rdquo;</p>
-                          {q.reply && (
-                            <div className="p-2.5 rounded-lg bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-800 dark:text-cyan-200">
-                              <strong className="text-cyan-700 dark:text-cyan-400 block mb-0.5">
-                                Verified Faculty Response:
-                              </strong>
-                              {q.reply}
+                          ) : (
+                            <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                              <p>
+                                <strong className="text-slate-900 dark:text-white">1. Diagnostic Confirmation:</strong> Utilize calibrated V-shaped blood collection drape. Immediate quantitative confirmation of &ge; 500 mL triggers bundle activation within 60 seconds.
+                              </p>
+                              <p>
+                                <strong className="text-slate-900 dark:text-white">2. Parallel First-Response Bundle:</strong> Initiate continuous bimanual fundal massage; administer Oxytocin 10 IU IM and simultaneously start Tranexamic Acid (TXA) 1g IV over 10 minutes (within 3-hour golden window).
+                              </p>
+                              <p>
+                                <strong className="text-slate-900 dark:text-white">3. Aggressive Fluid &amp; Transfusion:</strong> Dual 16G IV cannulas with warm Ringer&apos;s Lactate. Initiate cross-match and emergency 1:1:1 component therapy (PRBC/FFP/Platelets) if Shock Index &ge; 0.9.
+                              </p>
+                              <p>
+                                <strong className="text-slate-900 dark:text-white">4. Theater Escalation:</strong> Direct transfer to operating theatre for uterine artery embolization, B-Lynch brace suturing, or peripartum hysterectomy if bleeding persists past 20 minutes.
+                              </p>
                             </div>
                           )}
                         </div>
-                      ))}
+                      ) : (
+                        <div className="bg-gradient-to-br from-amber-50/80 to-slate-50 dark:from-amber-950/40 dark:to-slate-900 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-5">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                              <Stethoscope size={15} /> Rural Health Centre III/IV Stabilization Protocol
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                Emergency Condom UBT
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+                                NASG Anti-Shock Garment
+                              </span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+                                Manual Aortic Compression
+                              </span>
+                            </div>
+                          </div>
+
+                          {currentTopic?.ruralProtocol || currentTopic?.hc3Adaptation ? (
+                            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line">
+                              {currentTopic.ruralProtocol || currentTopic.hc3Adaptation}
+                            </p>
+                          ) : (
+                            <div className="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                              <p>
+                                <strong>1. Resource-Adapted Quantification:</strong> If pre-packaged calibrated drapes are out of stock, use a clean plastic receiver or gravimetric gauze weighing (1g = 1 mL blood). Never rely on visual guesswork.
+                              </p>
+                              <p>
+                                <strong>2. Immediate First-Line Uterotonics:</strong> Oxytocin 10 IU IM. If cold-chain failure or oxytocin is absent, administer sublingual Misoprostol 800 mcg immediately.
+                              </p>
+                              <p>
+                                <strong>3. Mechanical Tamponade (Condom UBT):</strong> Tie a sterile lubricated condom to a Foley catheter with silk suture; insert into the uterine cavity and inflate with 300–500 mL of sterile saline until bleeding stops.
+                              </p>
+                              <p>
+                                <strong>4. NASG &amp; Transfer Handshake:</strong> Apply Non-Pneumatic Anti-Shock Garment (NASG) starting from ankle segments 1-3 up to abdominal ball segment 6. Maintain continuous External Aortic Compression during ambulance transit and execute SBAR phone escalation to the referral hospital.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
+
+                    {/* Sub-Topic Content Body */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl">
+                      <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <span className="px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider">
+                          Module {selectedModIdx + 1} &bull; Topic {selectedTopIdx + 1}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-md bg-cyan-50 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800 text-[10px] font-bold">
+                          Competency: {currentTopic?.competencyTag || `ALU-${selectedModIdx + 1}.${selectedTopIdx + 1}`}
+                        </span>
+                      </div>
+
+                      <h2 className="text-xl sm:text-2xl font-black font-['Outfit'] text-slate-900 dark:text-white mb-6">
+                        {currentTopic?.title}
+                      </h2>
+
+                      <div className="prose prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed space-y-4">
+                        {currentTopic?.content?.split('\n\n').map((paragraph, pIdx) => (
+                          <p key={pIdx} className="whitespace-pre-line">
+                            {paragraph}
+                          </p>
+                        ))}
+                      </div>
+
+                      {/* Attached Learning Resources */}
+                      {currentTopic?.resources && currentTopic.resources.length > 0 && (
+                        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                          <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <FileText size={14} className="text-cyan-600 dark:text-cyan-400" /> Attached Clinical Resources &amp; Shared Drive Materials
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {currentTopic.resources.map((res, rIdx) => (
+                              <a
+                                key={rIdx}
+                                href={res.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-cyan-500 transition-all text-xs font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                              >
+                                <span className="truncate pr-2">{res.title}</span>
+                                <ExternalLink size={14} className="text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Banner to Quiz */}
+                      <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Completed reading this sub-topic? Verify clinical mastery with the option-specific conditional quiz.
+                        </p>
+                        <button
+                          onClick={() => setActiveTab('quiz')}
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md cursor-pointer"
+                        >
+                          Start Sub-Topic Quiz <ArrowRight size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: CLINICAL SIMULATION STATIONS (Engines A, B, D) */}
+                {activeTab === 'simulation' && (
+                  <div className="space-y-6 animate-fade-in">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-4 flex flex-wrap gap-2 shadow-sm">
+                      {[
+                        { id: 'engineA', label: 'Engine A: 90s Action Sequencer', icon: Activity, tag: 'Physiological Clock' },
+                        { id: 'engineB', label: 'Engine B: Voice SBAR Handover Grader', icon: Mic, tag: 'Communication' },
+                        { id: 'engineD', label: 'Engine D: 3D WebAR Pocket Manikin', icon: Box, tag: 'Spatial Computing' }
+                      ].map((engine) => {
+                        const Icon = engine.icon;
+                        const isCurrent = selectedEngine === engine.id;
+                        const score = simScores[engine.id];
+                        return (
+                          <button
+                            key={engine.id}
+                            onClick={() => setSelectedEngine(engine.id)}
+                            className={`flex-1 min-w-[200px] flex items-center justify-between p-3.5 rounded-xl border text-left transition-all ${isCurrent
+                                ? 'bg-slate-950 border-cyan-500 text-white shadow-lg'
+                                : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-slate-200'
+                              }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <Icon size={18} className={isCurrent ? 'text-cyan-400' : 'text-slate-500'} />
+                              <div>
+                                <div className="text-xs font-bold">{engine.label}</div>
+                                <div className="text-[10px] text-slate-500">{engine.tag}</div>
+                              </div>
+                            </div>
+                            {score !== null && (
+                              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-black">
+                                {score}%
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {selectedEngine === 'engineA' && (
+                      <ActionSequencer
+                        onComplete={({ score }) => {
+                          setSimScores((prev) => ({ ...prev, engineA: score }));
+                        }}
+                      />
+                    )}
+
+                    {selectedEngine === 'engineB' && (
+                      <SbarHandover
+                        onComplete={({ totalScore }) => {
+                          setSimScores((prev) => ({ ...prev, engineB: totalScore }));
+                        }}
+                      />
+                    )}
+
+                    {selectedEngine === 'engineD' && (
+                      <WebArPocketManikin
+                        onComplete={(score) => {
+                          setSimScores((prev) => ({ ...prev, engineD: score }));
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 3: SUB-TOPIC GAMIFIED QUIZZES WITH OPTION-SPECIFIC FEEDBACK & 3S AUTO-ADVANCE */}
+                {activeTab === 'quiz' && (
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl animate-fade-in space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 text-[11px] font-black uppercase tracking-wider mb-1">
+                          <Award size={13} className="text-cyan-600 dark:text-cyan-400" /> Sub-Topic Gamified Mastery Check
+                        </div>
+                        <h3 className="text-xl font-bold font-['Outfit'] text-slate-900 dark:text-white">
+                          Instant Feedback &amp; Option Rationale Engine
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Every option reveals its specific clinical rationale. Pass all questions to auto-advance in 3 seconds.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-amber-700 dark:text-amber-400 flex-shrink-0">
+                        <Shield size={14} /> Manual Skip Blocked
+                      </div>
+                    </div>
+
+                    {autoAdvanceTimer !== null && (
+                      <div className="bg-gradient-to-r from-emerald-950 to-cyan-950 border-2 border-emerald-500 rounded-2xl p-4 text-white shadow-xl flex items-center justify-between gap-4 animate-bounce">
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 size={24} className="text-emerald-400" />
+                          <div>
+                            <div className="text-sm font-bold font-['Outfit']">
+                              All clinical answers verified!
+                            </div>
+                            <div className="text-xs text-emerald-300">
+                              Auto-advancing to the next sub-topic in <strong>{countdownSeconds} seconds...</strong>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={advanceToNextTopic}
+                          className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex-shrink-0 shadow-md cursor-pointer"
+                        >
+                          Advance Now &rarr;
+                        </button>
+                      </div>
+                    )}
+
+                    {currentQuiz.length > 0 ? (
+                      currentQuiz.map((q, qIdx) => {
+                        const selectedOpt = quizState[qIdx];
+                        const isAnswered = selectedOpt !== undefined;
+                        const isCorrect = Number(selectedOpt) === Number(q.correctIndex);
+
+                        return (
+                          <div
+                            key={qIdx}
+                            className={`p-5 sm:p-6 rounded-2xl border transition-all ${isAnswered
+                                ? isCorrect
+                                  ? 'bg-emerald-50/70 dark:bg-slate-950/70 border-emerald-300 dark:border-emerald-800'
+                                  : 'bg-rose-50/70 dark:bg-slate-950/70 border-rose-300 dark:border-rose-800'
+                                : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800'
+                              }`}
+                          >
+                            <div className="flex items-start gap-3 mb-4">
+                              <span className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800 text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                                {qIdx + 1}
+                              </span>
+                              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug">
+                                {q.question}
+                              </h4>
+                            </div>
+
+                            <div className="space-y-2.5">
+                              {q.options.map((optionText, optIdx) => {
+                                const isThisSelected = selectedOpt === optIdx;
+                                const isThisCorrect = optIdx === Number(q.correctIndex);
+
+                                let btnStyle =
+                                  'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-300 hover:border-cyan-500 dark:hover:border-slate-600';
+                                if (isAnswered) {
+                                  if (isThisSelected) {
+                                    btnStyle = isThisCorrect
+                                      ? 'bg-emerald-600 text-white border-emerald-600 font-semibold shadow-xs'
+                                      : 'bg-rose-600 text-white border-rose-600 font-semibold shadow-xs';
+                                  } else if (isThisCorrect) {
+                                    btnStyle = 'bg-emerald-50 dark:bg-slate-900 border-emerald-300 dark:border-emerald-700/60 text-emerald-800 dark:text-emerald-300 font-bold';
+                                  } else {
+                                    btnStyle =
+                                      'bg-slate-100/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/60 text-slate-400 opacity-60';
+                                  }
+                                }
+
+                                return (
+                                  <button
+                                    key={optIdx}
+                                    onClick={() => handleSelectQuizOption(qIdx, optIdx)}
+                                    className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-start gap-3 cursor-pointer ${btnStyle}`}
+                                  >
+                                    <span className="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                                      {String.fromCharCode(65 + optIdx)}
+                                    </span>
+                                    <span className="text-xs sm:text-sm leading-relaxed flex-1">
+                                      {optionText}
+                                    </span>
+                                    {isAnswered &&
+                                      isThisSelected &&
+                                      (isThisCorrect ? (
+                                        <CheckCircle
+                                          size={16}
+                                          className="text-white flex-shrink-0 mt-0.5"
+                                        />
+                                      ) : (
+                                        <XCircle
+                                          size={16}
+                                          className="text-white flex-shrink-0 mt-0.5"
+                                        />
+                                      ))}
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {isAnswered && (
+                              <div
+                                className={`mt-4 p-4 rounded-xl border text-xs sm:text-sm leading-relaxed animate-fade-in ${isCorrect
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200'
+                                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200'
+                                  }`}
+                              >
+                                <div className="font-bold flex items-center gap-1.5 mb-1">
+                                  {isCorrect ? (
+                                    <>
+                                      <CheckCircle size={15} className="text-emerald-400" />
+                                      Clinical Rationale (Option {String.fromCharCode(65 + selectedOpt)}):
+                                    </>
+                                  ) : (
+                                    <>
+                                      <AlertTriangle size={15} className="text-rose-400" />
+                                      Why Option {String.fromCharCode(65 + selectedOpt)} is Clinically Incorrect:
+                                    </>
+                                  )}
+                                </div>
+                                <p className="opacity-95">
+                                  {q.optionFeedback && q.optionFeedback[selectedOpt]
+                                    ? q.optionFeedback[selectedOpt]
+                                    : isCorrect
+                                      ? q.explanation ||
+                                      'Correct! This matches the national clinical treatment protocol.'
+                                      : q.explanation
+                                        ? `Incorrect. Clinical rationale: ${q.explanation}`
+                                        : 'This choice does not follow standard clinical protocol.'}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-sm text-slate-400 text-center py-8">
+                        No micro-quiz attached to this sub-topic. Continue to the next unit.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 4: DR. PAM CLINICAL INTELLIGENCE & DIRECT PROFESSOR Q&A */}
+                {activeTab === 'drpam' && (
+                  <div className="space-y-6 animate-fade-in">
+                    {/* Dr. Pam Clinical Intelligence Card */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-xl space-y-4">
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-950 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                            <Sparkles size={20} />
+                          </div>
+                          <div>
+                            <h3 className="text-base font-bold font-['Outfit'] text-slate-900 dark:text-white">
+                              Dr. Pam — Clinical Study Assistant
+                            </h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                              Answers based on {course.title} &amp; approved Ministry of Health guidelines
+                            </p>
+                          </div>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
+                          &bull; Online &amp; Ready
+                        </span>
+                      </div>
+
+                      {/* Message Log */}
+                      <div className="space-y-3 max-h-[360px] overflow-y-auto pr-2">
+                        {drPamMessages.map((msg, idx) => (
+                          <div key={idx} className="space-y-2">
+                            <div
+                              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                              <div
+                                className={`max-w-[85%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed shadow-xs ${msg.sender === 'user'
+                                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-tr-none whitespace-pre-line'
+                                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
+                                  }`}
+                              >
+                                {msg.sender === 'user' ? msg.text : renderFormattedContent(msg.text)}
+                              </div>
+                            </div>
+
+                            {/* Interactive Course Enrollment Card */}
+                            {msg.enrolledCourse && (
+                              <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/80 rounded-2xl p-4 space-y-2.5 shadow-md animate-fade-in max-w-[85%]">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                                    <CheckCircle size={14} className="text-emerald-600 dark:text-emerald-400" /> Course Enrolled &amp; Unlocked
+                                  </span>
+                                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                                    +{msg.enrolledCourse.cpd || course.cpd || 15} CPD Points
+                                  </span>
+                                </div>
+                                <div className="text-xs font-bold text-slate-900 dark:text-white">
+                                  {msg.enrolledCourse.title}
+                                </div>
+                                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                  All modules, clinical simulation stations, and OSCE assessments are now active and ready for your learning journey.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedModIdx(0);
+                                    setSelectedTopIdx(0);
+                                    setActiveTab('curriculum');
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-sm transition-all cursor-pointer"
+                                >
+                                  <PlayCircle size={14} /> Start Module 1 Now &rarr;
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {isPamThinking && (
+                          <div className="flex justify-start">
+                            <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+                              Dr. Pam Clinical Intelligence is cross-referencing module protocols...
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Input Form */}
+                      <form onSubmit={handleDrPamSubmit} className="flex gap-2 pt-2">
+                        <input
+                          type="text"
+                          value={drPamQuery}
+                          onChange={(e) => setDrPamQuery(e.target.value)}
+                          placeholder="Ask Dr. Pam about dosages, protocols, or rural HC III/IV adaptations..."
+                          className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isPamThinking}
+                          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-sm"
+                        >
+                          <Send size={14} /> Ask Dr. Pam
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Direct Question to Authoring Professor (Syncs to Educator Studio Q&A Desk) */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-xl space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                        <div>
+                          <h4 className="text-sm font-bold font-['Outfit'] text-slate-900 dark:text-white flex items-center gap-2">
+                            <MessageCircle size={16} className="text-cyan-600 dark:text-cyan-400" />
+                            Ask Lead Authoring Professor ({course.instructor || 'Faculty Q&A Desk'})
+                          </h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Questions submitted here route in real time to the Educator Studio Q&amp;A Desk.
+                          </p>
+                        </div>
+                      </div>
+
+                      {profQuestionSubmitted && (
+                        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-xs text-emerald-800 dark:text-emerald-300 font-bold">
+                          Your clinical question has been sent to the Professor&apos;s Educator Studio Q&amp;A Desk!
+                        </div>
+                      )}
+
+                      <form onSubmit={handleAskProfessorSubmit} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={profQuestionInput}
+                          onChange={(e) => setProfQuestionInput(e.target.value)}
+                          placeholder="Submit a clinical case question for direct faculty verification..."
+                          className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                        />
+                        <button
+                          type="submit"
+                          className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-cyan-700 dark:text-cyan-400 border border-slate-200 dark:border-cyan-800 font-bold text-xs whitespace-nowrap cursor-pointer transition-colors"
+                        >
+                          Send to Professor
+                        </button>
+                      </form>
+
+                      {courseQuestions.length > 0 && (
+                        <div className="space-y-3 pt-3">
+                          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Recent Faculty Q&amp;A Threads ({courseQuestions.length})
+                          </div>
+                          {courseQuestions.map((q) => (
+                            <div
+                              key={q.id}
+                              className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs"
+                            >
+                              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                                <span className="font-bold text-slate-800 dark:text-slate-200">{q.studentName}</span>
+                                <span>{q.timestamp}</span>
+                              </div>
+                              <p className="text-slate-700 dark:text-slate-300">&ldquo;{q.question}&rdquo;</p>
+                              {q.reply && (
+                                <div className="p-2.5 rounded-lg bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-800 dark:text-cyan-200">
+                                  <strong className="text-cyan-700 dark:text-cyan-400 block mb-0.5">
+                                    Verified Faculty Response:
+                                  </strong>
+                                  {q.reply}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -1670,11 +1661,10 @@ export default function CoursePage({ params }) {
                     <ShieldCheck size={14} /> Official Course Certificate
                   </span>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                      milestoneEligibility.canMint || existingCourseCertificate
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${milestoneEligibility.canMint || existingCourseCertificate
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-700'
                         : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-slate-950 dark:text-amber-400 dark:border-amber-800/70'
-                    }`}
+                      }`}
                   >
                     {milestoneEligibility.canMint || existingCourseCertificate
                       ? 'Ready to Download'
@@ -1751,13 +1741,12 @@ export default function CoursePage({ params }) {
                         type="button"
                         disabled={!canRunFollowUp || isDone}
                         onClick={() => handleCompleteRecurringFollowUp(drillTitle)}
-                        className={`w-full text-left p-2.5 rounded-xl border text-[11px] transition-all flex items-center justify-between gap-2 ${
-                          isDone
+                        className={`w-full text-left p-2.5 rounded-xl border text-[11px] transition-all flex items-center justify-between gap-2 ${isDone
                             ? 'bg-purple-50 border-purple-200 text-purple-900 dark:bg-purple-950/40 dark:border-purple-700/70 dark:text-purple-200 font-bold'
                             : canRunFollowUp
-                            ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:border-slate-800 dark:text-slate-200 cursor-pointer'
-                            : 'bg-slate-50/50 border-slate-200/60 text-slate-400 dark:bg-slate-950/50 dark:border-slate-800/60 dark:text-slate-500 opacity-60 cursor-not-allowed'
-                        }`}
+                              ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:border-slate-800 dark:text-slate-200 cursor-pointer'
+                              : 'bg-slate-50/50 border-slate-200/60 text-slate-400 dark:bg-slate-950/50 dark:border-slate-800/60 dark:text-slate-500 opacity-60 cursor-not-allowed'
+                          }`}
                       >
                         <span className="truncate">{drillTitle}</span>
                         {isDone ? (
@@ -1857,11 +1846,10 @@ export default function CoursePage({ params }) {
                                   setSelectedModIdx(mIdx);
                                   setSelectedTopIdx(tIdx);
                                 }}
-                                className={`w-full text-left p-2 rounded-lg text-xs transition-all flex items-center justify-between gap-2 cursor-pointer ${
-                                  isActive
+                                className={`w-full text-left p-2 rounded-lg text-xs transition-all flex items-center justify-between gap-2 cursor-pointer ${isActive
                                     ? 'bg-cyan-50 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300 font-bold border border-cyan-200 dark:border-cyan-800'
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-950'
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-center gap-2 truncate">
                                   {modLocked ? (
@@ -1922,11 +1910,10 @@ export default function CoursePage({ params }) {
                     <button
                       key={i}
                       onClick={() => setPreTestAnswers((prev) => ({ ...prev, q1: i }))}
-                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                        preTestAnswers.q1 === i
+                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${preTestAnswers.q1 === i
                           ? 'bg-cyan-600 border-cyan-600 text-white font-bold shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-cyan-400'
-                      }`}
+                        }`}
                     >
                       {opt}
                     </button>
@@ -1947,11 +1934,10 @@ export default function CoursePage({ params }) {
                     <button
                       key={i}
                       onClick={() => setPreTestAnswers((prev) => ({ ...prev, q2: i }))}
-                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                        preTestAnswers.q2 === i
+                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${preTestAnswers.q2 === i
                           ? 'bg-cyan-600 border-cyan-600 text-white font-bold shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-cyan-400'
-                      }`}
+                        }`}
                     >
                       {opt}
                     </button>
@@ -1969,11 +1955,10 @@ export default function CoursePage({ params }) {
                       <button
                         key={i}
                         onClick={() => setPreTestAnswers((prev) => ({ ...prev, q3: i }))}
-                        className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                          preTestAnswers.q3 === i
+                        className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${preTestAnswers.q3 === i
                             ? 'bg-cyan-600 border-cyan-600 text-white font-bold shadow-xs'
                             : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-cyan-400'
-                        }`}
+                          }`}
                       >
                         {opt}
                       </button>
@@ -2028,11 +2013,10 @@ export default function CoursePage({ params }) {
                     <button
                       key={i}
                       onClick={() => setPostTestAnswers((prev) => ({ ...prev, q1: i }))}
-                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                        postTestAnswers.q1 === i
+                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${postTestAnswers.q1 === i
                           ? 'bg-cyan-600 border-cyan-600 text-white font-bold shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-cyan-400'
-                      }`}
+                        }`}
                     >
                       {opt}
                     </button>
@@ -2053,11 +2037,10 @@ export default function CoursePage({ params }) {
                     <button
                       key={i}
                       onClick={() => setPostTestAnswers((prev) => ({ ...prev, q2: i }))}
-                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                        postTestAnswers.q2 === i
+                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${postTestAnswers.q2 === i
                           ? 'bg-cyan-600 border-cyan-600 text-white font-bold shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-cyan-400'
-                      }`}
+                        }`}
                     >
                       {opt}
                     </button>
@@ -2078,11 +2061,10 @@ export default function CoursePage({ params }) {
                     <button
                       key={i}
                       onClick={() => setPostTestAnswers((prev) => ({ ...prev, q3: i }))}
-                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                        postTestAnswers.q3 === i
+                      className={`w-full text-left p-3 rounded-xl border text-xs cursor-pointer transition-all ${postTestAnswers.q3 === i
                           ? 'bg-cyan-600 border-cyan-600 text-white font-bold shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:border-cyan-400'
-                      }`}
+                        }`}
                     >
                       {opt}
                     </button>
