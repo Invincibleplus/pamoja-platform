@@ -1,5 +1,10 @@
-import { NextResponse } from 'next/server';
-import { SEED_COURSES } from '../../../lib/seedCourses';
+import { SEED_COURSES } from '../../../lib/seedCourses.js';
+
+const NextResponse = {
+  json(body, init) {
+    return Response.json(body, init);
+  }
+};
 
 /**
  * Pamoja Clinical Superintelligence Engine (Pamoja-MedLM)

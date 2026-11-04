@@ -9,8 +9,17 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === 'development',
 });
 
+const isCloudflareExport = process.env.CF_STATIC_EXPORT === '1';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(isCloudflareExport
+    ? {
+        output: 'export',
+        distDir: '.open-next/assets',
+        images: { unoptimized: true },
+      }
+    : {}),
   outputFileTracingRoot: __dirname,
   eslint: {
     ignoreDuringBuilds: true,

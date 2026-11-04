@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build-cloudflare.mjs",
     "start": "next start",
     "preview": "node scripts/preview.mjs",
     "lint": "eslint"

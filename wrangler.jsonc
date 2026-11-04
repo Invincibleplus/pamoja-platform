@@ -12,7 +12,7 @@
     "binding": "ASSETS"
   },
   "build": {
-    "command": "npm i --no-save --force @opennextjs/cloudflare@1.20.16 && npx opennextjs-cloudflare build"
+    "command": "node scripts/build-cloudflare.mjs"
   },
   "observability": {
     "enabled": true
