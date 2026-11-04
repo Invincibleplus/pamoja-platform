@@ -33,64 +33,61 @@ process.on('SIGTERM', () => {
 });
 
 async function main() {
-  // If .open-next/worker.js and .open-next/assets/index.html were just built within the last 120 seconds, skip duplicate rebuild
-  if (
-    fs.existsSync(workerFile) &&
-    fs.existsSync(path.join(assetsDir, 'index.html')) &&
-    !process.argv.includes('--force')
-  ) {
-    const stat = fs.statSync(workerFile);
-    if (Date.now() - stat.mtimeMs < 120_000) {
-      console.log('✓ Reusing fresh .open-next bundle built Seconds ago.');
-      return;
-    }
-  }
+  const indexHtmlPath = path.join(assetsDir, 'index.html');
+  const isFreshStaticBuild =
+    fs.existsSync(indexHtmlPath) &&
+    !process.argv.includes('--force') &&
+    Date.now() - fs.statSync(indexHtmlPath).mtimeMs < 120_000;
 
-  console.log('▶ Building Pamoja Platform static assets + native Cloudflare Worker...');
+  if (isFreshStaticBuild) {
+    console.log('✓ Reusing fresh .open-next/assets static build and refreshing worker.js...');
+  } else {
+    console.log('▶ Building Pamoja Platform static assets + native Cloudflare Worker...');
 
-  // Clean previous .open-next output
-  fs.rmSync(openNextDir, { recursive: true, force: true });
+    // Clean previous .open-next output
+    fs.rmSync(openNextDir, { recursive: true, force: true });
 
-  try {
-    // Temporarily stash app/api so Next.js output: 'export' compiles all pages statically
-    if (fs.existsSync(appApiDir)) {
-      if (fs.existsSync(stashApiDir)) {
-        fs.rmSync(stashApiDir, { recursive: true, force: true });
+    try {
+      // Temporarily stash app/api so Next.js output: 'export' compiles all pages statically
+      if (fs.existsSync(appApiDir)) {
+        if (fs.existsSync(stashApiDir)) {
+          fs.rmSync(stashApiDir, { recursive: true, force: true });
+        }
+        fs.renameSync(appApiDir, stashApiDir);
       }
-      fs.renameSync(appApiDir, stashApiDir);
+
+      const nextBin = path.join(rootDir, 'node_modules', 'next', 'dist', 'bin', 'next');
+      const fixScript = path.join(__dirname, 'windows-fs-fix.cjs').replace(/\\/g, '/');
+      const isWindows = process.platform === 'win32';
+      const existingNodeOptions = process.env.NODE_OPTIONS || '';
+      const nodeOptions =
+        isWindows && fs.existsSync(path.join(__dirname, 'windows-fs-fix.cjs'))
+          ? `${existingNodeOptions} --require "${fixScript}"`.trim()
+          : existingNodeOptions;
+
+      const res = spawnSync(process.execPath, [nextBin, 'build'], {
+        cwd: rootDir,
+        stdio: 'inherit',
+        env: {
+          ...process.env,
+          CF_STATIC_EXPORT: '1',
+          NODE_OPTIONS: nodeOptions,
+        },
+      });
+
+      if (res.status !== 0) {
+        throw new Error(`next build exited with code ${res.status}`);
+      }
+    } finally {
+      restoreApiDir();
     }
 
-    const nextBin = path.join(rootDir, 'node_modules', 'next', 'dist', 'bin', 'next');
-    const fixScript = path.join(__dirname, 'windows-fs-fix.cjs').replace(/\\/g, '/');
-    const isWindows = process.platform === 'win32';
-    const existingNodeOptions = process.env.NODE_OPTIONS || '';
-    const nodeOptions =
-      isWindows && fs.existsSync(path.join(__dirname, 'windows-fs-fix.cjs'))
-        ? `${existingNodeOptions} --require "${fixScript}"`.trim()
-        : existingNodeOptions;
-
-    const res = spawnSync(process.execPath, [nextBin, 'build'], {
-      cwd: rootDir,
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        CF_STATIC_EXPORT: '1',
-        NODE_OPTIONS: nodeOptions,
-      },
-    });
-
-    if (res.status !== 0) {
-      throw new Error(`next build exited with code ${res.status}`);
+    // If Next.js placed exported files in out/, move them to .open-next/assets
+    const outDir = path.join(rootDir, 'out');
+    if (fs.existsSync(path.join(outDir, 'index.html')) && !fs.existsSync(indexHtmlPath)) {
+      fs.mkdirSync(openNextDir, { recursive: true });
+      fs.cpSync(outDir, assetsDir, { recursive: true });
     }
-  } finally {
-    restoreApiDir();
-  }
-
-  // If Next.js placed exported files in out/, move them to .open-next/assets
-  const outDir = path.join(rootDir, 'out');
-  if (fs.existsSync(path.join(outDir, 'index.html')) && !fs.existsSync(path.join(assetsDir, 'index.html'))) {
-    fs.mkdirSync(openNextDir, { recursive: true });
-    fs.cpSync(outDir, assetsDir, { recursive: true });
   }
 
   if (!fs.existsSync(path.join(assetsDir, 'index.html'))) {
@@ -178,7 +175,8 @@ export default {
         // If Next.js App Router requests an RSC payload on a clean URL, resolve the exported .txt flight file first
         if (isRscRequest && !pathname.endsWith('.txt') && !pathname.startsWith('/_next/')) {
           const rscUrl = new URL(url.toString());
-          const cleanPath = pathname === '/' ? '/index' : pathname.replace(/\/$/, '');
+          const trimmedPath = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+          const cleanPath = trimmedPath === '/' ? '/index' : trimmedPath;
           rscUrl.pathname = cleanPath + '.txt';
           const rscResponse = await env.ASSETS.fetch(new Request(rscUrl.toString(), request));
           if (rscResponse.status !== 404) {
